@@ -1,0 +1,15 @@
+{
+  "name": "datamaks-mockups",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Univerzalni AI mockup generator — hosting + generisanje + istek (demo.datamaks.net).",
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "expire": "node scripts/expire.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
+    "nodemailer": "^6.9.14"
+  }
+}
