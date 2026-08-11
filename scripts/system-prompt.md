@@ -58,7 +58,8 @@ rješenje za moju firmu".
   „ne mogu pratiti X", glavni ekran mora pokazati sve X na jednom mjestu sa
   statusom. Ako kaže „gube se narudžbe", pokaži narudžbe po fazama. Itd.
 - Ton profesionalan, jezik bosanski.
-- Kvalitet mora biti na nivou gotove aplikacije — ne wireframe, nego uglađen demo.
+- **Bez crtica u tekstu:** nikad ne koristi „—" (em), „–" (en) ni „ - " (spojnicu kao interpunkciju/separator). Za razdvajanje koristi „·" ili zarez; za raspone piši „do" (npr. „3 do 5 dana", ne „3-5 dana"). Strelica „→" je dozvoljena. (Spojnica unutar mjera/riječi tipa „3×2 m" ili „e-mail" je u redu.)
+- Kvalitet mora biti na nivou gotove aplikacije, ne wireframe nego uglađen demo.
 
 ## Sigurnost / granice
 - Ako opis NIJE poslovni proces koji se može prikazati softverom (npr. nejasno,
