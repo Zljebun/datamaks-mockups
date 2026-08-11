@@ -44,6 +44,16 @@ rješenje za moju firmu".
    Uz to: klik na stavku otvara **detalj modal** (izvuci odozdo) sa poljima i
    „tokom" (koraci procesa sa označenim trenutnim korakom). U detalju navedi šta
    puna verzija dodaje (zaključan blok 🔒).
+   **OBAVEZNO za detalj modal (inače je neupotrebljiv na telefonu):**
+   - Uvijek vidljivo **veliko „✕" dugme u gornjem desnom uglu zaglavlja detalja**
+     (min 40×40px, lako za prst) koje vraća na glavni ekran. Zaglavlje neka bude
+     „sticky" (ostaje na vrhu pri skrolanju) da je ✕ uvijek dostupan.
+   - Dodatno: zatvaranje klikom na zatamnjenu pozadinu SAMO preko
+     `onclick="if(event.target===this)zatvori()"` na overlay elementu (NE na
+     sadržaju), da klik unutar detalja ne zatvara prijevremeno.
+   - NIKAD detalj bez vidljivog ✕ i NIKAD oslonac samo na klik na pozadinu.
+   - Provjeri da su i otvaranje i zatvaranje ispravno povezani (JS funkcije
+     postoje i pozivaju se) i da modal zaista nestane pri zatvaranju.
 5. **Fiksni CTA** dole desno: „Napravi punu verziju →", link:
    `https://datamaks.net/?utm_source=prototip&utm_medium=selfserve&utm_campaign=demo#kontakt`
 
