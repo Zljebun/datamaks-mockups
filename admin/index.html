@@ -148,7 +148,7 @@ function renderContacts(rows){
   const cards = rows.map(r=>{
     const tel=(r.telefon||'').replace(/[^\d+]/g,'');
     return `<div class="lead">
-      <div class="hd"><span class="badge b-new">poruka</span><span class="dt">${fmtDate(r.created_at)}</span></div>
+      <div class="hd"><span class="badge b-new">poruka</span><span style="display:flex;align-items:center;gap:12px"><span class="dt">${fmtDate(r.created_at)}</span><button title="Obriši poruku" onclick="delContact('${r.id}')" style="background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:17px;line-height:1;padding:0">&times;</button></span></div>
       <div class="kontakt">
         <span class="ime">${esc(r.ime)}${r.firma?` <span style="color:#94a3b8;font-weight:400;font-size:13px">· ${esc(r.firma)}</span>`:''}</span>
         <a href="mailto:${esc(r.email)}">${esc(r.email)}</a>
@@ -160,6 +160,15 @@ function renderContacts(rows){
     </div>`;
   }).join('');
   document.getElementById('list').innerHTML = `<div class="list">${cards}</div>`;
+}
+
+async function delContact(id){
+  if(!confirm('Obrisati ovu poruku? Ovo se ne može poništiti.')) return;
+  try{
+    const r = await fetch(FN+"?id="+encodeURIComponent(id), { method:"DELETE", headers:{ "x-admin-token": TOKEN } });
+    if(!r.ok) throw new Error();
+    load();
+  }catch(e){ alert('Greška pri brisanju.'); }
 }
 
 async function viewArh(id){

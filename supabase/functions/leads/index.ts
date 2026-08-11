@@ -8,7 +8,7 @@
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "content-type, x-admin-token",
 };
 const json = (s: number, b: unknown) =>
@@ -16,16 +16,23 @@ const json = (s: number, b: unknown) =>
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method !== "GET") return json(405, { error: "Method not allowed" });
-
   const ADMIN = Deno.env.get("ADMIN_TOKEN");
   if (!ADMIN || req.headers.get("x-admin-token") !== ADMIN) return json(401, { error: "Neovlašten pristup" });
 
   const SB = Deno.env.get("SUPABASE_URL")!;
   const KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const h = { apikey: KEY, Authorization: `Bearer ${KEY}` };
-
   const q = new URL(req.url).searchParams;
+
+  // Brisanje kontakt poruke
+  if (req.method === "DELETE") {
+    const cid = q.get("id");
+    if (!cid) return json(400, { error: "Nedostaje id" });
+    const dr = await fetch(`${SB}/rest/v1/datamaks_contacts?id=eq.${encodeURIComponent(cid)}`, { method: "DELETE", headers: h });
+    return json(dr.ok ? 200 : 500, dr.ok ? { ok: true } : { error: "Greška pri brisanju" });
+  }
+  if (req.method !== "GET") return json(405, { error: "Method not allowed" });
+
   const id = q.get("id");
   const view = q.get("view");
   let path: string;
