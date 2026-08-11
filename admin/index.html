@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lead-ovi · Datamaks admin</title>
+<title>Admin · Datamaks</title>
 <meta name="robots" content="noindex,nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -15,60 +15,60 @@
   .top .sp{margin-left:auto;display:flex;gap:8px;align-items:center}
   .top button{background:rgba(255,255,255,.18);color:#fff;border:none;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px}
   .wrap{max-width:1000px;margin:0 auto;padding:16px}
-  /* login */
+  .tabbar{display:flex;gap:8px;margin-bottom:14px}
+  .tabbtn{background:#fff;border:1px solid var(--line);color:var(--mut);padding:9px 18px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
+  .tabbtn.active{background:var(--b2);color:#fff;border-color:var(--b2)}
   .login{max-width:380px;margin:80px auto;background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(2,6,23,.1);padding:28px;text-align:center}
   .login h1{font-family:'Plus Jakarta Sans';font-size:20px;margin-bottom:8px}
   .login p{color:var(--mut);font-size:14px;margin-bottom:18px}
   .login input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font-size:15px;margin-bottom:12px}
   .login button{width:100%;background:linear-gradient(135deg,var(--b2),var(--b3));color:#fff;border:none;padding:13px;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer}
   .err{color:#b91c1c;font-size:13px;margin-top:10px;min-height:18px}
-  /* stats */
   .stats{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
   .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 16px;flex:1;min-width:100px}
   .stat .n{font-family:'Plus Jakarta Sans';font-size:22px;font-weight:800}
   .stat .l{font-size:12px;color:var(--mut)}
-  /* lead kartice */
   .list{display:grid;grid-template-columns:1fr;gap:12px}
   @media(min-width:760px){.list{grid-template-columns:1fr 1fr}}
   .lead{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
   .lead .hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
   .badge{font-size:11.5px;font-weight:700;border-radius:999px;padding:4px 11px;white-space:nowrap}
-  .b-queued{background:#fef9c3;color:#854d0e}
-  .b-live{background:#dcfce7;color:#166534}
-  .b-archived{background:#e2e8f0;color:#475569}
-  .b-rejected{background:#fee2e2;color:#991b1b}
+  .b-queued{background:#fef9c3;color:#854d0e}.b-live{background:#dcfce7;color:#166534}
+  .b-archived{background:#e2e8f0;color:#475569}.b-rejected{background:#fee2e2;color:#991b1b}
+  .b-new{background:#dbeafe;color:#1e40af}.b-notified{background:#e2e8f0;color:#475569}
   .lead .dt{font-size:12.5px;color:var(--mut)}
   .kontakt{display:flex;flex-direction:column;gap:4px}
-  .kontakt a{color:var(--b2);text-decoration:none;font-weight:600;font-size:15px;word-break:break-all}
-  .kontakt .tel{font-size:14px}
+  .kontakt .ime{font-weight:700;font-size:15px;color:#0f172a}
+  .kontakt a{color:var(--b2);text-decoration:none;font-weight:600;font-size:14px;word-break:break-all}
   .tip{align-self:flex-start;font-size:12px;background:#eef2ff;color:var(--b2);border-radius:999px;padding:3px 10px;font-weight:600}
   .opis{font-size:14px;color:#334155;line-height:1.45;background:#f8fafc;border:1px solid #eef2f6;border-radius:10px;padding:10px 12px;white-space:pre-wrap}
   .go{margin-top:2px;display:block;text-align:center;background:var(--b2);color:#fff;text-decoration:none;border:none;padding:12px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;width:100%}
-  .go.arh{background:#475569}
-  .go.none{background:#e2e8f0;color:#94a3b8;cursor:default}
+  .go.arh{background:#475569}.go.none{background:#e2e8f0;color:#94a3b8;cursor:default}
   .empty{padding:40px;text-align:center;color:var(--mut);background:#fff;border-radius:14px;border:1px solid var(--line)}
 </style>
 </head>
 <body>
-  <!-- LOGIN -->
   <div id="login" class="login">
-    <h1>Datamaks · Lead-ovi</h1>
+    <h1>Datamaks · Admin</h1>
     <p>Unesite admin lozinku za pregled.</p>
     <input id="tok" type="password" placeholder="Admin lozinka" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
     <button onclick="login()">Prijava</button>
     <div class="err" id="err"></div>
   </div>
 
-  <!-- APP -->
   <div id="app" style="display:none">
     <div class="top">
-      <b>Datamaks · Lead-ovi</b>
+      <b>Datamaks · Admin</b>
       <div class="sp">
         <button onclick="load()">↻ Osvježi</button>
         <button onclick="logout()">Odjava</button>
       </div>
     </div>
     <div class="wrap">
+      <div class="tabbar">
+        <button class="tabbtn active" id="tab-leads" onclick="setView('leads')">Prototipi</button>
+        <button class="tabbtn" id="tab-poruke" onclick="setView('poruke')">Poruke</button>
+      </div>
       <div class="stats" id="stats"></div>
       <div id="list"><div class="empty">Učitavanje…</div></div>
     </div>
@@ -78,6 +78,7 @@
 const FN = "https://tjufkzervoxvyteomaww.supabase.co/functions/v1/leads";
 const KEY = "dmk_admin_token";
 let TOKEN = localStorage.getItem(KEY) || "";
+let VIEW = "leads";
 
 function esc(s){return (s||'').replace(/[&<>"]/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[x]))}
 function fmtDate(s){const d=new Date(s);return d.toLocaleString('bs-BA',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'})}
@@ -92,44 +93,70 @@ function login(){
   TOKEN = document.getElementById('tok').value.trim();
   if(!TOKEN) return;
   document.getElementById('err').textContent = "Provjera…";
-  api().then(data=>{ localStorage.setItem(KEY, TOKEN); show(); render(data); })
+  api().then(()=>{ localStorage.setItem(KEY, TOKEN); show(); load(); })
        .catch(e=>{ document.getElementById('err').textContent = e.message==="401" ? "Pogrešna lozinka." : "Greška pri povezivanju."; });
 }
 function logout(){ localStorage.removeItem(KEY); TOKEN=""; location.reload(); }
 function show(){ document.getElementById('login').style.display='none'; document.getElementById('app').style.display='block'; }
 
+function setView(v){
+  VIEW=v;
+  document.getElementById('tab-leads').classList.toggle('active', v==='leads');
+  document.getElementById('tab-poruke').classList.toggle('active', v==='poruke');
+  load();
+}
+
 async function load(){
   document.getElementById('list').innerHTML='<div class="empty">Učitavanje…</div>';
-  try{ render(await api()); }
-  catch(e){ if(e.message==="401") logout(); else document.getElementById('list').innerHTML='<div class="empty">Greška pri učitavanju.</div>'; }
+  document.getElementById('stats').innerHTML='';
+  try{
+    if(VIEW==='poruke'){ renderContacts(await api("?view=contacts")); }
+    else { render(await api()); }
+  }catch(e){ if(e.message==="401") logout(); else document.getElementById('list').innerHTML='<div class="empty">Greška pri učitavanju.</div>'; }
 }
 
 function render(rows){
   if(!Array.isArray(rows)) rows=[];
-  const c={total:rows.length,live:0,queued:0,archived:0,rejected:0};
+  const c={total:rows.length,live:0,queued:0,archived:0};
   rows.forEach(r=>{ if(c[r.status]!==undefined) c[r.status]++; });
   document.getElementById('stats').innerHTML =
     `<div class="stat"><div class="n">${c.total}</div><div class="l">Ukupno</div></div>
      <div class="stat"><div class="n" style="color:#166534">${c.live}</div><div class="l">Aktivni</div></div>
      <div class="stat"><div class="n" style="color:#854d0e">${c.queued}</div><div class="l">U redu</div></div>
      <div class="stat"><div class="n" style="color:#475569">${c.archived}</div><div class="l">Arhivirani</div></div>`;
-
-  if(!rows.length){ document.getElementById('list').innerHTML='<div class="empty">Još nema lead-ova.</div>'; return; }
+  if(!rows.length){ document.getElementById('list').innerHTML='<div class="empty">Još nema prototipa.</div>'; return; }
   const cards = rows.map(r=>{
-    const live = r.status==='live', arch = r.status==='archived';
-    const tel = (r.telefon||'').replace(/[^\d+]/g,'');
+    const live=r.status==='live', arch=r.status==='archived';
+    const tel=(r.telefon||'').replace(/[^\d+]/g,'');
     const btn = live ? `<a class="go" href="https://demo.datamaks.net/m/${encodeURIComponent(r.mockup_id)}/" target="_blank" rel="noopener">Otvori mockup ↗</a>`
               : arch ? `<button class="go arh" onclick="viewArh('${r.mockup_id}')">Vidi arhivirani mockup</button>`
               : `<div class="go none">${esc(r.status==='queued'?'Mockup se pravi…':r.status)}</div>`;
     return `<div class="lead">
       <div class="hd"><span class="badge b-${esc(r.status)}">${esc(r.status)}</span><span class="dt">${fmtDate(r.created_at)}</span></div>
+      <div class="kontakt"><a href="mailto:${esc(r.email)}">${esc(r.email)}</a><a href="tel:${esc(tel)}">${esc(r.telefon)}</a></div>
+      ${r.tip?`<span class="tip">${esc(r.tip)}</span>`:''}
+      <div class="opis">${esc(r.opis)}</div>${btn}</div>`;
+  }).join('');
+  document.getElementById('list').innerHTML = `<div class="list">${cards}</div>`;
+}
+
+function renderContacts(rows){
+  if(!Array.isArray(rows)) rows=[];
+  document.getElementById('stats').innerHTML =
+    `<div class="stat"><div class="n">${rows.length}</div><div class="l">Ukupno poruka</div></div>`;
+  if(!rows.length){ document.getElementById('list').innerHTML='<div class="empty">Još nema poruka.</div>'; return; }
+  const cards = rows.map(r=>{
+    const tel=(r.telefon||'').replace(/[^\d+]/g,'');
+    return `<div class="lead">
+      <div class="hd"><span class="badge b-new">poruka</span><span class="dt">${fmtDate(r.created_at)}</span></div>
       <div class="kontakt">
+        <span class="ime">${esc(r.ime)}${r.firma?` <span style="color:#94a3b8;font-weight:400;font-size:13px">· ${esc(r.firma)}</span>`:''}</span>
         <a href="mailto:${esc(r.email)}">${esc(r.email)}</a>
-        <a class="tel" href="tel:${esc(tel)}">${esc(r.telefon)}</a>
+        ${r.telefon?`<a href="tel:${esc(tel)}">${esc(r.telefon)}</a>`:''}
       </div>
       ${r.tip?`<span class="tip">${esc(r.tip)}</span>`:''}
-      <div class="opis">${esc(r.opis)}</div>
-      ${btn}
+      <div class="opis">${esc(r.poruka)}</div>
+      <a class="go" href="mailto:${esc(r.email)}?subject=Odgovor%20-%20Datamaks">Odgovori ↗</a>
     </div>`;
   }).join('');
   document.getElementById('list').innerHTML = `<div class="list">${cards}</div>`;
@@ -139,12 +166,11 @@ async function viewArh(id){
   try{
     const lead = await api("?id="+encodeURIComponent(id));
     if(!lead || !lead.mockup_html){ alert("Arhiva nije dostupna."); return; }
-    const w = window.open("", "_blank");
-    w.document.write(lead.mockup_html); w.document.close();
+    const w = window.open("", "_blank"); w.document.write(lead.mockup_html); w.document.close();
   }catch(e){ alert("Greška pri učitavanju arhive."); }
 }
 
-if(TOKEN){ api().then(d=>{show();render(d);}).catch(()=>{}); }
+if(TOKEN){ api().then(()=>{show();load();}).catch(()=>{}); }
 </script>
 </body>
 </html>

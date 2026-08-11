@@ -25,9 +25,13 @@ Deno.serve(async (req) => {
   const KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const h = { apikey: KEY, Authorization: `Bearer ${KEY}` };
 
-  const id = new URL(req.url).searchParams.get("id");
+  const q = new URL(req.url).searchParams;
+  const id = q.get("id");
+  const view = q.get("view");
   let path: string;
-  if (id) {
+  if (view === "contacts") {
+    path = `/rest/v1/datamaks_contacts?select=id,ime,email,firma,telefon,tip,poruka,status,created_at&order=created_at.desc&limit=500`;
+  } else if (id) {
     path = `/rest/v1/datamaks_leads?mockup_id=eq.${encodeURIComponent(id)}&select=*`;
   } else {
     path = `/rest/v1/datamaks_leads?select=mockup_id,email,telefon,tip,opis,status,created_at,archived_at&order=created_at.desc&limit=500`;

@@ -1,0 +1,28 @@
+name: Kontakt poruka (mail)
+
+on:
+  repository_dispatch:
+    types: [contact-message]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci || npm install
+      - name: Pošalji notifikaciju
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          IME: ${{ github.event.client_payload.ime }}
+          EMAIL: ${{ github.event.client_payload.email }}
+          FIRMA: ${{ github.event.client_payload.firma }}
+          TELEFON: ${{ github.event.client_payload.telefon }}
+          TIP: ${{ github.event.client_payload.tip }}
+          PORUKA: ${{ github.event.client_payload.poruka }}
+        run: node scripts/contact.mjs

@@ -83,6 +83,35 @@ export async function sendLinkEmail({ to, link }) {
   });
 }
 
+// Notifikacija o novoj kontakt poruci sa datamaks.net (na Datamaks inbox).
+export async function sendContactEmail({ ime, email, firma, telefon, tip, poruka }) {
+  const t = smtp();
+  const to = (process.env.CONTACT_NOTIFY || "info@datamaks.net, zljebun@gmail.com");
+  const esc = (s) => String(s || "").replace(/[<>&]/g, (x) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[x]));
+  await t.sendMail({
+    from: '"Datamaks sajt" <info@datamaks.net>',
+    to,
+    replyTo: email,
+    subject: `Nova poruka sa datamaks.net: ${ime}`,
+    text:
+      `Nova kontakt poruka sa datamaks.net\n\n` +
+      `Ime: ${ime}\nEmail: ${email}\nFirma: ${firma || "-"}\nTelefon: ${telefon || "-"}\nTema: ${tip || "-"}\n\nPoruka:\n${poruka || "(bez poruke)"}\n`,
+    html:
+      `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#0f172a">
+        <h2 style="color:#1e40af;margin:0 0 14px">Nova poruka sa datamaks.net</h2>
+        <table style="width:100%;border-collapse:collapse;font-size:14px">
+          <tr><td style="padding:6px 0;color:#64748b;width:90px">Ime</td><td style="padding:6px 0"><b>${esc(ime)}</b></td></tr>
+          <tr><td style="padding:6px 0;color:#64748b">Email</td><td style="padding:6px 0"><a href="mailto:${esc(email)}">${esc(email)}</a></td></tr>
+          <tr><td style="padding:6px 0;color:#64748b">Firma</td><td style="padding:6px 0">${esc(firma) || "-"}</td></tr>
+          <tr><td style="padding:6px 0;color:#64748b">Telefon</td><td style="padding:6px 0">${esc(telefon) || "-"}</td></tr>
+          <tr><td style="padding:6px 0;color:#64748b">Tema</td><td style="padding:6px 0">${esc(tip) || "-"}</td></tr>
+        </table>
+        <div style="margin-top:14px;padding:14px;background:#f8fafc;border:1px solid #eef2f6;border-radius:10px;white-space:pre-wrap;font-size:14px;line-height:1.6">${esc(poruka) || "(bez poruke)"}</div>
+        <p style="color:#94a3b8;font-size:12px;margin-top:16px">Odgovorite direktno na ovaj mail da odgovorite pošiljaocu.</p>
+      </div>`,
+  });
+}
+
 // Keep-alive: sitni upit na bazu (drži Supabase free projekt aktivnim da se ne pauzira).
 export async function supabaseKeepAlive() {
   const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SERVICE_ROLE_KEY;
