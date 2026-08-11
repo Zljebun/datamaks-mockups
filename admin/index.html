@@ -14,7 +14,7 @@
   .top b{font-family:'Plus Jakarta Sans';font-size:16px}
   .top .sp{margin-left:auto;display:flex;gap:8px;align-items:center}
   .top button{background:rgba(255,255,255,.18);color:#fff;border:none;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px}
-  .wrap{max-width:1100px;margin:0 auto;padding:16px}
+  .wrap{max-width:1000px;margin:0 auto;padding:16px}
   /* login */
   .login{max-width:380px;margin:80px auto;background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(2,6,23,.1);padding:28px;text-align:center}
   .login h1{font-family:'Plus Jakarta Sans';font-size:20px;margin-bottom:8px}
@@ -24,27 +24,29 @@
   .err{color:#b91c1c;font-size:13px;margin-top:10px;min-height:18px}
   /* stats */
   .stats{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-  .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 16px;flex:1;min-width:110px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 16px;flex:1;min-width:100px}
   .stat .n{font-family:'Plus Jakarta Sans';font-size:22px;font-weight:800}
   .stat .l{font-size:12px;color:var(--mut)}
-  /* table */
-  .card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  table{width:100%;border-collapse:collapse;font-size:13.5px}
-  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid #f1f5f9;vertical-align:top}
-  th{background:#f8fafc;font-weight:600;color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
-  tr:hover td{background:#fafbfc}
-  .badge{font-size:11.5px;font-weight:600;border-radius:999px;padding:3px 9px;white-space:nowrap}
+  /* lead kartice */
+  .list{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:760px){.list{grid-template-columns:1fr 1fr}}
+  .lead{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .lead .hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .badge{font-size:11.5px;font-weight:700;border-radius:999px;padding:4px 11px;white-space:nowrap}
   .b-queued{background:#fef9c3;color:#854d0e}
   .b-live{background:#dcfce7;color:#166534}
   .b-archived{background:#e2e8f0;color:#475569}
   .b-rejected{background:#fee2e2;color:#991b1b}
-  .opis{max-width:340px;color:#334155}
-  .opis.clip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
-  .act{white-space:nowrap}
-  .act a,.act button{font-size:12.5px;color:var(--b2);text-decoration:none;background:none;border:none;cursor:pointer;font-weight:600;padding:2px 4px}
-  .muted{color:#94a3b8}
-  .empty{padding:40px;text-align:center;color:var(--mut)}
-  @media(max-width:720px){.tel-col,.tip-col{display:none}.opis{max-width:160px}}
+  .lead .dt{font-size:12.5px;color:var(--mut)}
+  .kontakt{display:flex;flex-direction:column;gap:4px}
+  .kontakt a{color:var(--b2);text-decoration:none;font-weight:600;font-size:15px;word-break:break-all}
+  .kontakt .tel{font-size:14px}
+  .tip{align-self:flex-start;font-size:12px;background:#eef2ff;color:var(--b2);border-radius:999px;padding:3px 10px;font-weight:600}
+  .opis{font-size:14px;color:#334155;line-height:1.45;background:#f8fafc;border:1px solid #eef2f6;border-radius:10px;padding:10px 12px;white-space:pre-wrap}
+  .go{margin-top:2px;display:block;text-align:center;background:var(--b2);color:#fff;text-decoration:none;border:none;padding:12px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;width:100%}
+  .go.arh{background:#475569}
+  .go.none{background:#e2e8f0;color:#94a3b8;cursor:default}
+  .empty{padding:40px;text-align:center;color:var(--mut);background:#fff;border-radius:14px;border:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -52,7 +54,7 @@
   <div id="login" class="login">
     <h1>Datamaks · Lead-ovi</h1>
     <p>Unesite admin lozinku za pregled.</p>
-    <input id="tok" type="password" placeholder="Admin lozinka" autocomplete="current-password">
+    <input id="tok" type="password" placeholder="Admin lozinka" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
     <button onclick="login()">Prijava</button>
     <div class="err" id="err"></div>
   </div>
@@ -68,7 +70,7 @@
     </div>
     <div class="wrap">
       <div class="stats" id="stats"></div>
-      <div class="card"><div id="tbl"><div class="empty">Učitavanje…</div></div></div>
+      <div id="list"><div class="empty">Učitavanje…</div></div>
     </div>
   </div>
 
@@ -90,20 +92,16 @@ function login(){
   TOKEN = document.getElementById('tok').value.trim();
   if(!TOKEN) return;
   document.getElementById('err').textContent = "Provjera…";
-  api().then(data=>{
-    localStorage.setItem(KEY, TOKEN);
-    show(); render(data);
-  }).catch(e=>{
-    document.getElementById('err').textContent = e.message==="401" ? "Pogrešna lozinka." : "Greška pri povezivanju.";
-  });
+  api().then(data=>{ localStorage.setItem(KEY, TOKEN); show(); render(data); })
+       .catch(e=>{ document.getElementById('err').textContent = e.message==="401" ? "Pogrešna lozinka." : "Greška pri povezivanju."; });
 }
 function logout(){ localStorage.removeItem(KEY); TOKEN=""; location.reload(); }
 function show(){ document.getElementById('login').style.display='none'; document.getElementById('app').style.display='block'; }
 
 async function load(){
-  document.getElementById('tbl').innerHTML='<div class="empty">Učitavanje…</div>';
+  document.getElementById('list').innerHTML='<div class="empty">Učitavanje…</div>';
   try{ render(await api()); }
-  catch(e){ if(e.message==="401") logout(); else document.getElementById('tbl').innerHTML='<div class="empty">Greška pri učitavanju.</div>'; }
+  catch(e){ if(e.message==="401") logout(); else document.getElementById('list').innerHTML='<div class="empty">Greška pri učitavanju.</div>'; }
 }
 
 function render(rows){
@@ -116,24 +114,25 @@ function render(rows){
      <div class="stat"><div class="n" style="color:#854d0e">${c.queued}</div><div class="l">U redu</div></div>
      <div class="stat"><div class="n" style="color:#475569">${c.archived}</div><div class="l">Arhivirani</div></div>`;
 
-  if(!rows.length){ document.getElementById('tbl').innerHTML='<div class="empty">Još nema lead-ova.</div>'; return; }
-  const body = rows.map(r=>{
-    const live = r.status==='live';
-    const arch = r.status==='archived';
-    const act = live ? `<a href="https://demo.datamaks.net/m/${encodeURIComponent(r.mockup_id)}/" target="_blank" rel="noopener">Otvori mockup ↗</a>`
-              : arch ? `<button onclick="viewArh('${r.mockup_id}')">Vidi arhivu</button>`
-              : `<span class="muted">${esc(r.status)}</span>`;
-    return `<tr>
-      <td class="muted">${fmtDate(r.created_at)}</td>
-      <td><span class="badge b-${esc(r.status)}">${esc(r.status)}</span></td>
-      <td>${esc(r.email)}<br><span class="muted tel-col">${esc(r.telefon)}</span></td>
-      <td class="tip-col muted">${esc(r.tip||'')}</td>
-      <td class="opis clip" title="Klik za cijeli tekst" onclick="this.classList.toggle('clip')">${esc(r.opis)}</td>
-      <td class="act">${act}</td>
-    </tr>`;
+  if(!rows.length){ document.getElementById('list').innerHTML='<div class="empty">Još nema lead-ova.</div>'; return; }
+  const cards = rows.map(r=>{
+    const live = r.status==='live', arch = r.status==='archived';
+    const tel = (r.telefon||'').replace(/[^\d+]/g,'');
+    const btn = live ? `<a class="go" href="https://demo.datamaks.net/m/${encodeURIComponent(r.mockup_id)}/" target="_blank" rel="noopener">Otvori mockup ↗</a>`
+              : arch ? `<button class="go arh" onclick="viewArh('${r.mockup_id}')">Vidi arhivirani mockup</button>`
+              : `<div class="go none">${esc(r.status==='queued'?'Mockup se pravi…':r.status)}</div>`;
+    return `<div class="lead">
+      <div class="hd"><span class="badge b-${esc(r.status)}">${esc(r.status)}</span><span class="dt">${fmtDate(r.created_at)}</span></div>
+      <div class="kontakt">
+        <a href="mailto:${esc(r.email)}">${esc(r.email)}</a>
+        <a class="tel" href="tel:${esc(tel)}">${esc(r.telefon)}</a>
+      </div>
+      ${r.tip?`<span class="tip">${esc(r.tip)}</span>`:''}
+      <div class="opis">${esc(r.opis)}</div>
+      ${btn}
+    </div>`;
   }).join('');
-  document.getElementById('tbl').innerHTML =
-    `<table><thead><tr><th>Datum</th><th>Status</th><th>Email / telefon</th><th class="tip-col">Djelatnost</th><th>Opis problema</th><th></th></tr></thead><tbody>${body}</tbody></table>`;
+  document.getElementById('list').innerHTML = `<div class="list">${cards}</div>`;
 }
 
 async function viewArh(id){
@@ -145,8 +144,7 @@ async function viewArh(id){
   }catch(e){ alert("Greška pri učitavanju arhive."); }
 }
 
-// auto-login ako token postoji
-if(TOKEN){ api().then(d=>{show();render(d);}).catch(()=>{ /* ostani na login */ }); }
+if(TOKEN){ api().then(d=>{show();render(d);}).catch(()=>{}); }
 </script>
 </body>
 </html>
