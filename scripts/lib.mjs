@@ -52,6 +52,18 @@ export async function sendLinkEmail({ to, link }) {
   });
 }
 
+// Keep-alive: sitni upit na bazu (drži Supabase free projekt aktivnim da se ne pauzira).
+export async function supabaseKeepAlive() {
+  const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return;
+  try {
+    await fetch(`${url}/rest/v1/datamaks_leads?select=mockup_id&limit=1`, {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+    });
+    console.log("keep-alive: baza pingovana");
+  } catch (e) { console.error("keep-alive greška:", e.message); }
+}
+
 // Ažuriraj status lead-a u Supabase (opcionalno; PII ostaje u Supabase, ne u repou).
 export async function supabaseUpdateLead(id, fields) {
   const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SERVICE_ROLE_KEY;

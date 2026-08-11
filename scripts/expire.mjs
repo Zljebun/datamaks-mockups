@@ -5,12 +5,14 @@
 
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { ROOT, loadMockups, saveMockups, supabaseUpdateLead } from "./lib.mjs";
+import { ROOT, loadMockups, saveMockups, supabaseUpdateLead, supabaseKeepAlive } from "./lib.mjs";
 
 const TTL_MS = 24 * 60 * 60 * 1000;
 const STUB = readFileSync(join(ROOT, "_stub-expired.html"), "utf8");
 
 async function main() {
+  await supabaseKeepAlive();   // svaki sat pingne bazu → nikad se ne pauzira
+
   const list = loadMockups();
   const now = Date.now();
 
