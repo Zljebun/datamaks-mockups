@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Datamaks · Demo — Špedicija</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  :root{
+    --plava:#1E40AF; --grad:linear-gradient(135deg,#1e3a8a,#2563eb);
+    --tekst:#0f172a; --prig:#64748b; --bg:#f1f5f9; --lin:#e6eaf0;
+  }
+  body{ font-family:'Inter',sans-serif; background:var(--bg); color:var(--tekst); line-height:1.45; }
+  h1,h2,h3,h4,.jak{ font-family:'Plus Jakarta Sans',sans-serif; }
+  .app{ max-width:440px; margin:0 auto; background:var(--bg); min-height:100vh; position:relative; padding-bottom:90px; }
+
+  /* Header */
+  header{ background:var(--grad); color:#fff; padding:16px 16px 18px; position:sticky; top:0; z-index:20; }
+  .hrow{ display:flex; align-items:center; gap:11px; }
+  .logo{ width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:17px; letter-spacing:.5px; flex-shrink:0; }
+  .hnaziv{ font-family:'Plus Jakarta Sans'; font-weight:800; font-size:17px; }
+  .hsub{ font-size:11.5px; opacity:.85; }
+  .demo-badge{ margin-left:auto; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); font-size:9.5px; font-weight:600; padding:5px 8px; border-radius:20px; text-align:center; line-height:1.2; flex-shrink:0; }
+
+  /* Tabovi */
+  .tabs{ display:flex; gap:7px; overflow-x:auto; padding:12px 16px; background:#fff; border-bottom:1px solid var(--lin); position:sticky; top:78px; z-index:19; scrollbar-width:none; }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab{ white-space:nowrap; font-size:12.5px; font-weight:600; padding:8px 13px; border-radius:20px; border:1px solid var(--lin); background:#fff; color:var(--prig); cursor:pointer; flex-shrink:0; }
+  .tab.active{ background:var(--plava); color:#fff; border-color:var(--plava); }
+  .tab.lock{ opacity:.75; }
+
+  /* Banner */
+  .banner{ margin:14px 16px 4px; background:#eef4ff; border:1px solid #d6e2ff; color:#1e3a8a; font-size:12px; padding:11px 13px; border-radius:12px; }
+  .banner b{ font-weight:700; }
+
+  /* KPI */
+  .kpis{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:14px 16px 4px; }
+  .kpi{ background:#fff; border:1px solid var(--lin); border-radius:14px; padding:13px; box-shadow:0 1px 2px rgba(15,23,42,.04); }
+  .kpi .num{ font-family:'Plus Jakarta Sans'; font-weight:800; font-size:22px; }
+  .kpi .lbl{ font-size:11px; color:var(--prig); margin-top:2px; }
+  .kpi .tag{ font-size:10px; font-weight:600; padding:2px 7px; border-radius:20px; display:inline-block; margin-top:6px; }
+  .t-ok{ background:#dcfce7; color:#15803d; } .t-warn{ background:#fef3c7; color:#b45309; } .t-bad{ background:#fee2e2; color:#b91c1c; }
+
+  .sekcija-nas{ padding:16px 16px 6px; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14.5px; display:flex; align-items:center; gap:7px; }
+  .sekcija-nas span{ font-size:11px; font-weight:600; color:var(--prig); }
+
+  /* Kanban */
+  .board{ display:flex; gap:12px; overflow-x:auto; padding:6px 16px 8px; scrollbar-width:none; }
+  .board::-webkit-scrollbar{ display:none; }
+  .col{ min-width:250px; max-width:250px; flex-shrink:0; }
+  .col-head{ display:flex; align-items:center; gap:7px; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:12.5px; margin-bottom:9px; padding:0 2px; }
+  .dot{ width:9px; height:9px; border-radius:50%; }
+  .col-cnt{ margin-left:auto; background:#e2e8f0; color:#475569; font-size:10.5px; font-weight:600; padding:1px 7px; border-radius:20px; }
+  .card{ background:#fff; border:1px solid var(--lin); border-radius:13px; padding:12px; margin-bottom:10px; cursor:pointer; box-shadow:0 1px 2px rgba(15,23,42,.04); transition:transform .1s; }
+  .card:active{ transform:scale(.98); }
+  .card-top{ display:flex; justify-content:space-between; align-items:start; gap:8px; }
+  .card-id{ font-size:10.5px; font-weight:600; color:var(--plava); }
+  .card-ruta{ font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13.5px; margin:3px 0 5px; }
+  .card-meta{ font-size:11.5px; color:var(--prig); display:flex; flex-direction:column; gap:3px; }
+  .card-meta .r{ display:flex; align-items:center; gap:6px; }
+  .prio{ font-size:9.5px; font-weight:700; padding:2px 7px; border-radius:20px; }
+  .p-hitno{ background:#fee2e2; color:#b91c1c; } .p-plan{ background:#e0e7ff; color:#4338ca; }
+  .bar{ height:5px; background:#eef2f7; border-radius:10px; margin-top:9px; overflow:hidden; }
+  .bar i{ display:block; height:100%; background:var(--grad); border-radius:10px; }
+
+  /* Servis lista (druga sekcija) */
+  .lista{ padding:4px 16px 8px; }
+  .srv{ background:#fff; border:1px solid var(--lin); border-radius:13px; padding:12px 13px; margin-bottom:10px; display:flex; align-items:center; gap:11px; cursor:pointer; box-shadow:0 1px 2px rgba(15,23,42,.04); }
+  .srv-ic{ width:40px; height:40px; border-radius:11px; background:#eef4ff; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; }
+  .srv-body{ flex:1; min-width:0; }
+  .srv-tit{ font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13.5px; }
+  .srv-sub{ font-size:11.5px; color:var(--prig); }
+  .srv-tag{ font-size:9.5px; font-weight:700; padding:3px 8px; border-radius:20px; white-space:nowrap; }
+
+  /* Modal */
+  .ovl{ position:fixed; inset:0; background:rgba(15,23,42,.5); z-index:40; display:none; align-items:flex-end; justify-content:center; }
+  .ovl.open{ display:flex; }
+  .sheet{ background:var(--bg); width:100%; max-width:440px; max-height:90vh; overflow-y:auto; border-radius:20px 20px 0 0; padding:8px 16px 28px; animation:up .25s ease; }
+  @keyframes up{ from{transform:translateY(100%);} to{transform:translateY(0);} }
+  .grip{ width:42px; height:5px; background:#cbd5e1; border-radius:10px; margin:8px auto 14px; }
+  .m-id{ font-size:11px; font-weight:600; color:var(--plava); }
+  .m-tit{ font-family:'Plus Jakarta Sans'; font-weight:800; font-size:20px; margin:2px 0 3px; }
+  .m-sub{ font-size:12.5px; color:var(--prig); margin-bottom:14px; }
+  .fld{ background:#fff; border:1px solid var(--lin); border-radius:12px; padding:11px 13px; margin-bottom:9px; }
+  .fld .k{ font-size:10.5px; color:var(--prig); font-weight:600; text-transform:uppercase; letter-spacing:.4px; }
+  .fld .v{ font-size:13.5px; font-weight:500; margin-top:2px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+  .grid2 .fld{ margin-bottom:0; }
+
+  .tok-nas{ font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13.5px; margin:16px 0 10px; }
+  .tok{ position:relative; padding-left:26px; }
+  .tok .step{ position:relative; padding-bottom:15px; }
+  .tok .step:before{ content:''; position:absolute; left:-19px; top:2px; width:13px; height:13px; border-radius:50%; background:#cbd5e1; border:3px solid var(--bg); }
+  .tok .step:after{ content:''; position:absolute; left:-13.5px; top:14px; width:2px; height:calc(100% - 14px); background:#cbd5e1; }
+  .tok .step:last-child:after{ display:none; }
+  .tok .step.done:before{ background:#22c55e; }
+  .tok .step.now:before{ background:var(--plava); box-shadow:0 0 0 4px rgba(30,64,175,.18); }
+  .tok .step .st{ font-size:13px; font-weight:600; }
+  .tok .step .sd{ font-size:11px; color:var(--prig); }
+  .tok .step.now .st{ color:var(--plava); }
+
+  .locked{ background:linear-gradient(135deg,#f8fafc,#eef2f9); border:1px dashed #c7d2e5; border-radius:13px; padding:14px; margin-top:16px; }
+  .locked .lt{ font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13px; display:flex; align-items:center; gap:7px; }
+  .locked ul{ margin:8px 0 0 18px; font-size:12px; color:var(--prig); }
+  .locked li{ margin-bottom:3px; }
+
+  /* CTA */
+  .cta{ position:fixed; bottom:18px; right:0; left:0; max-width:440px; margin:0 auto; padding:0 16px; z-index:30; pointer-events:none; text-align:right; }
+  .cta a{ pointer-events:auto; display:inline-flex; align-items:center; gap:8px; background:var(--grad); color:#fff; text-decoration:none; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; padding:14px 20px; border-radius:30px; box-shadow:0 8px 24px rgba(30,64,175,.4); }
+
+  .foot{ text-align:center; font-size:11px; color:var(--prig); padding:8px 16px 20px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="hrow">
+      <div class="logo">ET</div>
+      <div>
+        <div class="hnaziv">Euro-Trans Špedicija</div>
+        <div class="hsub">Međunarodni transport i distribucija robe</div>
+      </div>
+      <div class="demo-badge">DEMO<br>izmišljeni podaci</div>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <div class="tab active">Transporti</div>
+    <div class="tab lock" onclick="lock()">🔒 Servis flote</div>
+    <div class="tab lock" onclick="lock()">🔒 Kupci</div>
+    <div class="tab lock" onclick="lock()">🔒 Fakturisanje</div>
+    <div class="tab lock" onclick="lock()">🔒 Izvještaji</div>
+  </nav>
+
+  <div class="banner">
+    <b>Ovo je vaš demo prototip</b> napravljen iz vašeg opisa — sve narudžbe, kamioni, kupci i servisi na jednom mjestu. Puna verzija dodaje automatske obavijesti o isteku registracija/servisa, fakturisanje i profitabilnost po ruti. <b>Za punu verziju javite se.</b>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi">
+      <div class="num">7</div>
+      <div class="lbl">Aktivnih transporta</div>
+      <span class="tag t-ok">3 u toku</span>
+    </div>
+    <div class="kpi">
+      <div class="num">2</div>
+      <div class="lbl">Servisa uskoro</div>
+      <span class="tag t-warn">1 hitno</span>
+    </div>
+    <div class="kpi">
+      <div class="num">12.4k KM</div>
+      <div class="lbl">Nefakturisano</div>
+      <span class="tag t-bad">4 naloga</span>
+    </div>
+    <div class="kpi">
+      <div class="num">18</div>
+      <div class="lbl">Aktivnih kupaca</div>
+      <span class="tag t-ok">+3 ovaj mj.</span>
+    </div>
+  </div>
+
+  <div class="sekcija-nas">Tabla transporta <span>· povuci lijevo za više faza</span></div>
+  <div class="board" id="board"></div>
+
+  <div class="sekcija-nas">Servis i registracija flote <span>· po hitnosti</span></div>
+  <div class="lista" id="servis"></div>
+
+  <div class="foot">Euro-Trans d.o.o. Tuzla · Demo prototip © Datamaks</div>
+</div>
+
+<!-- Modal transport -->
+<div class="ovl" id="ovl" onclick="if(event.target===this)close_()">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<div class="cta">
+  <a href="https://datamaks.net/?utm_source=prototip&utm_medium=selfserve&utm_campaign=demo#kontakt">Napravi punu verziju →</a>
+</div>
+
+<script>
+function lock(){ alert('Ova sekcija je dostupna u punoj verziji. Javite se da je aktiviramo za vašu firmu.'); }
+
+const kolone = [
+  { naziv:'Narudžba', boja:'#94a3b8' },
+  { naziv:'Utovar', boja:'#f59e0b' },
+  { naziv:'U transportu', boja:'#2563eb' },
+  { naziv:'Isporučeno', boja:'#22c55e' }
+];
+
+const transporti = [
+  { id:'TR-2418', ruta:'Tuzla → München', kolona:0, kupac:'Metalgradnja d.o.o.', roba:'Čelični profili, 22t', kamion:'M43-A-712 (MAN TGX)', vozac:'Senad H.', rok:'19.06.', prio:'plan', prog:10, korak:0 },
+  { id:'TR-2417', ruta:'Sarajevo → Zagreb', kolona:1, kupac:'AS Trgovina', roba:'Paletizirana roba, 14t', kamion:'A21-K-559 (Volvo FH)', vozac:'Damir P.', rok:'17.06.', prio:'hitno', prog:30, korak:1 },
+  { id:'TR-2415', ruta:'Tuzla → Ljubljana', kolona:2, kupac:'Drvoprodukt', roba:'Rezana građa, 24t', kamion:'M77-E-104 (Scania R)', vozac:'Nedžad K.', rok:'16.06.', prio:'plan', prog:60, korak:2 },
+  { id:'TR-2414', ruta:'Bihać → Graz', kolona:2, kupac:'FreshFruit GmbH', roba:'Hlađena roba, 18t', kamion:'B90-J-833 (Mercedes Actros)', vozac:'Elvis M.', rok:'16.06.', prio:'hitno', prog:75, korak:2 },
+  { id:'TR-2411', ruta:'Mostar → Split', kolona:3, kupac:'Jadran Logistika', roba:'Građevinski materijal, 20t', kamion:'M43-A-712 (MAN TGX)', vozac:'Senad H.', rok:'14.06.', prio:'plan', prog:100, korak:3 },
+  { id:'TR-2409', ruta:'Tuzla → Beč', kolona:3, kupac:'Autodijelovi Kovač', roba:'Auto dijelovi, 9t', kamion:'A21-K-559 (Volvo FH)', vozac:'Damir P.', rok:'13.06.', prio:'plan', prog:100, korak:3 },
+  { id:'TR-2419', ruta:'Brčko → Novi Sad', kolona:0, kupac:'Panonija Promet', roba:'Prehrambena roba, 16t', kamion:'B90-J-833 (Mercedes Actros)', vozac:'Elvis M.', rok:'20.06.', prio:'plan', prog:5, korak:0 }
+];
+
+const tokKoraci = ['Narudžba primljena','Utovar i papiri (CMR)','U transportu','Isporučeno kupcu'];
+
+const servisi = [
+  { ic:'🛠️', tit:'MAN TGX · M43-A-712', sub:'Veliki servis — 8.400 km do isteka intervala', tag:'ZA 6 DANA', boja:'t-warn' },
+  { ic:'⚠️', tit:'Volvo FH · A21-K-559', sub:'Registracija ističe 20.06.', tag:'HITNO', boja:'t-bad' },
+  { ic:'✅', tit:'Scania R · M77-E-104', sub:'Servisiran 02.06. — sve uredno', tag:'OK', boja:'t-ok' },
+  { ic:'🛠️', tit:'Mercedes Actros · B90-J-833', sub:'Zamjena guma zakazana', tag:'ZA 12 DANA', boja:'t-warn' }
+];
+
+// Render board
+const board = document.getElementById('board');
+kolone.forEach((k,ki)=>{
+  const items = transporti.filter(t=>t.kolona===ki);
+  const col = document.createElement('div');
+  col.className='col';
+  col.innerHTML = `<div class="col-head"><span class="dot" style="background:${k.boja}"></span>${k.naziv}<span class="col-cnt">${items.length}</span></div>`;
+  items.forEach(t=>{
+    const c = document.createElement('div');
+    c.className='card';
+    c.onclick=()=>openT(t);
+    c.innerHTML = `
+      <div class="card-top">
+        <span class="card-id">${t.id}</span>
+        <span class="prio ${t.prio==='hitno'?'p-hitno':'p-plan'}">${t.prio==='hitno'?'HITNO':'PLAN'}</span>
+      </div>
+      <div class="card-ruta">${t.ruta}</div>
+      <div class="card-meta">
+        <div class="r">🏢 ${t.kupac}</div>
+        <div class="r">🚚 ${t.kamion.split(' (')[0]} · ${t.vozac}</div>
+        <div class="r">📅 Rok: ${t.rok}</div>
+      </div>
+      <div class="bar"><i style="width:${t.prog}%"></i></div>`;
+    col.appendChild(c);
+  });
+  board.appendChild(col);
+});
+
+// Render servis
+const srvEl = document.getElementById('servis');
+servisi.forEach(s=>{
+  const d = document.createElement('div');
+  d.className='srv';
+  d.onclick=()=>lock();
+  d.innerHTML = `
+    <div class="srv-ic">${s.ic}</div>
+    <div class="srv-body">
+      <div class="srv-tit">${s.tit}</div>
+      <div class="srv-sub">${s.sub}</div>
+    </div>
+    <span class="srv-tag ${s.boja}">${s.tag}</span>`;
+  srvEl.appendChild(d);
+});
+
+// Modal
+function openT(t){
+  const steps = tokKoraci.map((s,i)=>{
+    let cls = i<t.korak ? 'done' : (i===t.korak ? 'now' : '');
+    let sub = i<t.korak ? 'Završeno' : (i===t.korak ? 'Trenutno' : 'Predstoji');
+    return `<div class="step ${cls}"><div class="st">${s}</div><div class="sd">${sub}</div></div>`;
+  }).join('');
+
+  document.getElementById('sheet').innerHTML = `
+    <div class="grip"></div>
+    <div class="m-id">${t.id} · ${t.prio==='hitno'?'HITNO':'Planirano'}</div>
+    <div class="m-tit">${t.ruta}</div>
+    <div class="m-sub">Napredak transporta: ${t.prog}%</div>
+
+    <div class="grid2">
+      <div class="fld"><div class="k">Kupac</div><div class="v">${t.kupac}</div></div>
+      <div class="fld"><div class="k">Rok isporuke</div><div class="v">${t.rok}</div></div>
+    </div>
+    <div class="fld" style="margin-top:9px"><div class="k">Roba</div><div class="v">${t.roba}</div></div>
+    <div class="grid2" style="margin-top:9px">
+      <div class="fld"><div class="k">Vozilo</div><div class="v">${t.kamion}</div></div>
+      <div class="fld"><div class="k">Vozač</div><div class="v">${t.vozac}</div></div>
+    </div>
+
+    <div class="tok-nas">Tok transporta</div>
+    <div class="tok">${steps}</div>
+
+    <div class="locked">
+      <div class="lt">🔒 U punoj verziji</div>
+      <ul>
+        <li>GPS praćenje kamiona uživo na karti</li>
+        <li>Automatska obavijest kupcu o isporuci (SMS/e-mail)</li>
+        <li>Digitalni CMR i skenirani tovarni listovi</li>
+        <li>Automatsko fakturisanje po završenom transportu</li>
+        <li>Profitabilnost rute (prihod − gorivo − putarine)</li>
+      </ul>
+    </div>
+  `;
+  document.getElementById('ovl').classList.add('open');
+}
+function close_(){ document.getElementById('ovl').classList.remove('open'); }
+</script>
+</body>
+</html>
