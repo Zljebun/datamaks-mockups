@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>GumaServis Tuzla · Demo prototip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  :root{
+    --plava:#1E40AF; --grad:linear-gradient(135deg,#1e3a8a,#2563eb);
+    --tekst:#0f172a; --prig:#64748b; --bg:#f1f5f9; --linija:#e6eaf0;
+  }
+  body{
+    font-family:'Inter',sans-serif; background:var(--bg); color:var(--tekst);
+    line-height:1.5; padding-bottom:96px; overflow-x:hidden;
+  }
+  .app{ max-width:520px; margin:0 auto; background:var(--bg); min-height:100vh; }
+  h1,h2,h3,h4,.jakarta{ font-family:'Plus Jakarta Sans',sans-serif; }
+
+  /* HEADER */
+  header{
+    background:var(--grad); color:#fff; padding:16px; position:sticky; top:0; z-index:20;
+    box-shadow:0 2px 12px rgba(30,64,175,.18);
+  }
+  .htop{ display:flex; align-items:center; gap:12px; }
+  .logo{
+    width:46px; height:46px; border-radius:12px; background:rgba(255,255,255,.16);
+    display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans';
+    font-weight:800; font-size:17px; flex-shrink:0; border:1px solid rgba(255,255,255,.25);
+  }
+  .hnaziv{ flex:1; min-width:0; }
+  .hnaziv .naz{ font-family:'Plus Jakarta Sans'; font-weight:800; font-size:17px; }
+  .hnaziv .pod{ font-size:12px; opacity:.85; }
+  .demo-badge{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.28);
+    padding:6px 9px; border-radius:20px; font-size:10px; font-weight:600; white-space:nowrap;
+    text-align:center; line-height:1.3;
+  }
+
+  /* TABOVI */
+  .tabovi{
+    display:flex; gap:8px; padding:12px 16px; overflow-x:auto; background:#fff;
+    border-bottom:1px solid var(--linija); position:sticky; top:78px; z-index:19;
+  }
+  .tabovi::-webkit-scrollbar{ display:none; }
+  .tab{
+    white-space:nowrap; padding:9px 14px; border-radius:20px; font-size:13px; font-weight:600;
+    border:1px solid var(--linija); background:#fff; color:var(--prig); cursor:pointer; flex-shrink:0;
+  }
+  .tab.akt{ background:var(--grad); color:#fff; border-color:transparent; }
+
+  /* BANNER */
+  .banner{
+    margin:12px 16px; padding:12px 14px; background:#eef4ff; border:1px solid #d6e4ff;
+    border-radius:12px; font-size:12.5px; color:#1e3a8a;
+  }
+  .banner b{ font-weight:600; }
+
+  /* KPI */
+  .kpi-red{ display:flex; gap:10px; padding:0 16px; overflow-x:auto; }
+  .kpi-red::-webkit-scrollbar{ display:none; }
+  .kpi{
+    background:#fff; border:1px solid var(--linija); border-radius:14px; padding:12px 14px;
+    min-width:110px; flex-shrink:0; box-shadow:0 1px 3px rgba(15,23,42,.04);
+  }
+  .kpi .num{ font-family:'Plus Jakarta Sans'; font-weight:800; font-size:22px; }
+  .kpi .lbl{ font-size:11px; color:var(--prig); margin-top:2px; }
+  .kpi .num.zel{ color:#16a34a; } .kpi .num.naran{ color:#d97706; } .kpi .num.plava{ color:var(--plava); }
+
+  /* KANBAN */
+  .sekcija-nas{ padding:16px 16px 6px; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:15px; }
+  .kolone{ display:flex; gap:12px; padding:6px 16px; overflow-x:auto; }
+  .kolone::-webkit-scrollbar{ height:6px; }
+  .kolone::-webkit-scrollbar-thumb{ background:#cbd5e1; border-radius:3px; }
+  .kolona{ min-width:250px; flex-shrink:0; }
+  .kol-head{
+    display:flex; align-items:center; gap:8px; padding:8px 4px; font-weight:700; font-size:13px;
+    font-family:'Plus Jakarta Sans';
+  }
+  .dot{ width:10px; height:10px; border-radius:50%; }
+  .kol-count{ margin-left:auto; background:#eef2f7; color:var(--prig); font-size:11px; padding:2px 8px; border-radius:10px; }
+
+  .kartica{
+    background:#fff; border:1px solid var(--linija); border-radius:14px; padding:13px;
+    margin-bottom:10px; cursor:pointer; box-shadow:0 1px 3px rgba(15,23,42,.05);
+    transition:transform .1s, box-shadow .1s;
+  }
+  .kartica:active{ transform:scale(.985); }
+  .k-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .k-tag{ font-size:11px; font-weight:600; color:var(--prig); }
+  .k-ime{ font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14.5px; margin:2px 0; }
+  .k-guma{ font-size:12.5px; color:var(--prig); }
+  .k-foot{ display:flex; align-items:center; gap:6px; margin-top:10px; flex-wrap:wrap; }
+  .chip{ font-size:11px; padding:3px 8px; border-radius:8px; font-weight:600; }
+  .chip.pneu{ background:#eef2f7; color:#475569; }
+  .chip.rok{ background:#fef3c7; color:#92400e; }
+  .chip.spreman{ background:#dcfce7; color:#166534; }
+  .chip.preuzeto{ background:#e2e8f0; color:#475569; }
+  .chip.tel{ background:#eff6ff; color:#1e40af; }
+
+  /* MODAL */
+  .overlay{
+    position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:50; display:none;
+    align-items:flex-end; justify-content:center;
+  }
+  .overlay.open{ display:flex; }
+  .detalj{
+    background:#fff; width:100%; max-width:520px; border-radius:20px 20px 0 0; max-height:92vh;
+    overflow-y:auto; animation:up .28s ease;
+  }
+  @keyframes up{ from{ transform:translateY(100%);} to{ transform:translateY(0);} }
+  .d-head{
+    position:sticky; top:0; background:#fff; padding:16px; border-bottom:1px solid var(--linija);
+    display:flex; align-items:flex-start; gap:12px; z-index:2;
+  }
+  .d-head .hnas{ flex:1; }
+  .d-head .hnas .t{ font-family:'Plus Jakarta Sans'; font-weight:800; font-size:17px; }
+  .d-head .hnas .s{ font-size:12.5px; color:var(--prig); }
+  .zatvori{
+    width:42px; height:42px; border-radius:12px; border:1px solid var(--linija); background:#f8fafc;
+    font-size:20px; color:var(--tekst); cursor:pointer; flex-shrink:0; display:flex;
+    align-items:center; justify-content:center; font-weight:600;
+  }
+  .zatvori:active{ background:#eef2f7; }
+  .d-body{ padding:16px; }
+  .polje{ display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid var(--linija); font-size:13.5px; }
+  .polje .lbl{ color:var(--prig); }
+  .polje .val{ font-weight:600; text-align:right; }
+
+  .tok-nas{ font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14px; margin:18px 0 10px; }
+  .tok{ position:relative; padding-left:8px; }
+  .korak{ display:flex; gap:12px; padding-bottom:16px; position:relative; }
+  .korak:last-child{ padding-bottom:0; }
+  .korak .marker{ position:relative; flex-shrink:0; }
+  .korak .kruzic{ width:22px; height:22px; border-radius:50%; border:2px solid var(--linija); background:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; }
+  .korak.done .kruzic{ background:#16a34a; border-color:#16a34a; color:#fff; }
+  .korak.now .kruzic{ background:var(--plava); border-color:var(--plava); color:#fff; }
+  .korak .linija-v{ position:absolute; left:10px; top:22px; bottom:-2px; width:2px; background:var(--linija); }
+  .korak:last-child .linija-v{ display:none; }
+  .korak.done .linija-v{ background:#16a34a; }
+  .korak .ktxt .kt{ font-weight:600; font-size:13.5px; }
+  .korak .ktxt .ks{ font-size:12px; color:var(--prig); }
+  .korak.now .ktxt .kt{ color:var(--plava); }
+
+  .zakljucan{
+    margin-top:18px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:14px; padding:14px;
+  }
+  .zakljucan .zn{ font-family:'Plus Jakarta Sans'; font-weight:700; font-size:13.5px; display:flex; align-items:center; gap:7px; }
+  .zakljucan ul{ margin:8px 0 0 20px; font-size:12.5px; color:var(--prig); }
+  .zakljucan li{ margin-bottom:4px; }
+
+  /* CTA */
+  .cta{
+    position:fixed; bottom:16px; right:16px; left:16px; max-width:488px; margin:0 auto; z-index:40;
+    background:var(--grad); color:#fff; text-decoration:none; padding:15px; border-radius:14px;
+    font-family:'Plus Jakarta Sans'; font-weight:700; font-size:15px; text-align:center;
+    box-shadow:0 8px 24px rgba(30,64,175,.4); display:block;
+  }
+  @media(min-width:520px){ .cta{ right:auto; left:50%; transform:translateX(-50%); width:488px; } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="htop">
+      <div class="logo">GS</div>
+      <div class="hnaziv">
+        <div class="naz">GumaServis Tuzla</div>
+        <div class="pod">Vulkanizerska radnja · servis i čuvanje guma</div>
+      </div>
+      <div class="demo-badge">DEMO · izmišljeni podaci</div>
+    </div>
+  </header>
+
+  <div class="tabovi">
+    <div class="tab akt">Radni nalozi</div>
+    <div class="tab" onclick="zakljucano()">🔒 Depo guma</div>
+    <div class="tab" onclick="zakljucano()">🔒 Fakturisanje</div>
+    <div class="tab" onclick="zakljucano()">🔒 SMS obavijesti</div>
+    <div class="tab" onclick="zakljucano()">🔒 Izvještaji</div>
+  </div>
+
+  <div class="banner">
+    Ovo je vaš demo prototip napravljen iz vašeg opisa. Sve gume na servisu vidite na jednom mjestu, sa vlasnikom i rokom preuzimanja. <b>Puna verzija</b> dodaje automatski SMS „gume su gotove", depo za sezonsko čuvanje i fakture. Za punu verziju javite se.
+  </div>
+
+  <div class="kpi-red">
+    <div class="kpi"><div class="num plava">7</div><div class="lbl">Trenutno u radnji</div></div>
+    <div class="kpi"><div class="num naran">3</div><div class="lbl">Rok danas</div></div>
+    <div class="kpi"><div class="num zel">2</div><div class="lbl">Spremno za preuzimanje</div></div>
+    <div class="kpi"><div class="num">14</div><div class="lbl">Završeno ovaj mjesec</div></div>
+  </div>
+
+  <div class="sekcija-nas">Tabla servisa</div>
+  <div class="kolone" id="kolone"></div>
+
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)zatvori()">
+  <div class="detalj" id="detalj"></div>
+</div>
+
+<a class="cta" href="https://datamaks.net/?utm_source=prototip&utm_medium=selfserve&utm_campaign=demo#kontakt">Napravi punu verziju →</a>
+
+<script>
+  const kolone = [
+    { id:'primljeno', naz:'Primljeno', boja:'#94a3b8' },
+    { id:'urad', naz:'U radu', boja:'#2563eb' },
+    { id:'spremno', naz:'Spremno za preuzimanje', boja:'#16a34a' },
+    { id:'preuzeto', naz:'Preuzeto', boja:'#cbd5e1' }
+  ];
+
+  const nalozi = [
+    { id:'RN-241', status:'primljeno', ime:'Emir Hodžić', tel:'061 234 567', vozilo:'VW Passat B8', reg:'A12-J-345',
+      guma:'4× Michelin 205/55 R16', usluga:'Zamjena zimskih za ljetne', primljeno:'Danas 08:15', rok:'Danas 14:00',
+      napomena:'Provjeriti balans prednjih.', korak:0 },
+    { id:'RN-240', status:'primljeno', ime:'Selma Begić', tel:'062 887 100', vozilo:'Škoda Octavia', reg:'E45-K-778',
+      guma:'2× Barum 195/65 R15', usluga:'Krpljenje pneumatika', primljeno:'Danas 08:40', rok:'Danas 12:00',
+      napomena:'Prednja lijeva ima ekser.', korak:0 },
+    { id:'RN-238', status:'urad', ime:'Damir Kovačević', tel:'061 445 902', vozilo:'BMW 320d', reg:'J77-A-221',
+      guma:'4× Continental 225/45 R17', usluga:'Montaža novih guma + balans', primljeno:'Danas 07:50', rok:'Danas 13:30',
+      napomena:'Kupac čeka u radnji.', korak:1 },
+    { id:'RN-237', status:'urad', ime:'Amela Suljić', tel:'063 210 448', vozilo:'Opel Astra', reg:'M33-T-909',
+      guma:'4× Sava 185/60 R15', usluga:'Rotacija + centriranje', primljeno:'Danas 09:10', rok:'Danas 15:00',
+      napomena:'Provjeriti pritisak, gubi vazduh.', korak:1 },
+    { id:'RN-235', status:'urad', ime:'Nedžad Mujić', tel:'061 778 334', vozilo:'Ford Focus', reg:'A90-E-112',
+      guma:'2× Debica 205/55 R16', usluga:'Vulkanizacija bočnice', primljeno:'Jučer 16:20', rok:'Danas 11:00',
+      napomena:'Sačekati sušenje.', korak:1 },
+    { id:'RN-233', status:'spremno', ime:'Jasmina Delić', tel:'062 556 781', vozilo:'Renault Clio', reg:'T22-J-654',
+      guma:'4× Kleber 175/65 R14', usluga:'Zamjena i pranje guma', primljeno:'Jučer 14:00', rok:'Danas 10:00',
+      napomena:'Naplaćeno 80 KM, čeka preuzimanje.', korak:2 },
+    { id:'RN-232', status:'spremno', ime:'Mirsad Alić', tel:'061 903 220', vozilo:'Audi A4', reg:'K18-M-440',
+      guma:'4× Pirelli 245/40 R18', usluga:'Montaža + balans + ventili', primljeno:'Jučer 13:15', rok:'Jučer 17:00',
+      napomena:'Nazvan, dolazi popodne.', korak:2 },
+    { id:'RN-229', status:'preuzeto', ime:'Vildana Hrnjić', tel:'063 118 552', vozilo:'Peugeot 208', reg:'E01-A-733',
+      guma:'2× Hankook 195/55 R16', usluga:'Krpljenje + balans', primljeno:'Prekjučer', rok:'Preuzeto jučer', 
+      napomena:'Plaćeno gotovinom.', korak:3 },
+    { id:'RN-228', status:'preuzeto', ime:'Adnan Ferhatović', tel:'062 447 019', vozilo:'Mercedes C220', reg:'J55-K-388',
+      guma:'4× Goodyear 225/50 R17', usluga:'Sezonska zamjena', primljeno:'Prekjučer', rok:'Preuzeto jučer',
+      napomena:'Gume ostavljene u depo.', korak:3 }
+  ];
+
+  const tokKoraci = [
+    { kt:'Primljeno', ks:'Nalog zaveden, gume preuzete od kupca' },
+    { kt:'U radu', ks:'Vulkanizer radi na gumama' },
+    { kt:'Spremno za preuzimanje', ks:'Gotovo, kupac obaviješten' },
+    { kt:'Preuzeto', ks:'Kupac podigao gume, naplaćeno' }
+  ];
+
+  function render(){
+    const cont = document.getElementById('kolone');
+    cont.innerHTML = '';
+    kolone.forEach(k=>{
+      const stavke = nalozi.filter(n=>n.status===k.id);
+      let html = `<div class="kolona"><div class="kol-head"><span class="dot" style="background:${k.boja}"></span>${k.naz}<span class="kol-count">${stavke.length}</span></div>`;
+      stavke.forEach(n=>{
+        let chipRok = '';
+        if(n.status==='spremno') chipRok = `<span class="chip spreman">Spremno</span>`;
+        else if(n.status==='preuzeto') chipRok = `<span class="chip preuzeto">Preuzeto</span>`;
+        else chipRok = `<span class="chip rok">Rok ${n.rok.replace('Danas ','')}</span>`;
+        html += `<div class="kartica" onclick="otvori('${n.id}')">
+          <div class="k-top"><span class="k-tag">${n.id} · ${n.vozilo}</span></div>
+          <div class="k-ime">${n.ime}</div>
+          <div class="k-guma">${n.guma}</div>
+          <div class="k-foot">
+            <span class="chip pneu">${n.usluga}</span>
+            ${chipRok}
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+      cont.innerHTML += html;
+    });
+  }
+
+  function otvori(id){
+    const n = nalozi.find(x=>x.id===id);
+    let tokHtml = '';
+    tokKoraci.forEach((t,i)=>{
+      let cls = i < n.korak ? 'done' : (i===n.korak ? 'now' : '');
+      let ikona = i < n.korak ? '✓' : (i+1);
+      tokHtml += `<div class="korak ${cls}">
+        <div class="marker"><div class="kruzic">${ikona}</div><div class="linija-v"></div></div>
+        <div class="ktxt"><div class="kt">${t.kt}</div><div class="ks">${t.ks}</div></div>
+      </div>`;
+    });
+
+    document.getElementById('detalj').innerHTML = `
+      <div class="d-head">
+        <div class="hnas">
+          <div class="t">${n.ime}</div>
+          <div class="s">${n.id} · ${n.vozilo} · ${n.reg}</div>
+        </div>
+        <button class="zatvori" onclick="zatvori()">✕</button>
+      </div>
+      <div class="d-body">
+        <div class="polje"><span class="lbl">Telefon</span><span class="val">${n.tel}</span></div>
+        <div class="polje"><span class="lbl">Gume</span><span class="val">${n.guma}</span></div>
+        <div class="polje"><span class="lbl">Usluga</span><span class="val">${n.usluga}</span></div>
+        <div class="polje"><span class="lbl">Primljeno</span><span class="val">${n.primljeno}</span></div>
+        <div class="polje"><span class="lbl">Rok / status</span><span class="val">${n.rok}</span></div>
+        <div class="polje"><span class="lbl">Napomena</span><span class="val">${n.napomena}</span></div>
+
+        <div class="tok-nas">Tok servisa</div>
+        <div class="tok">${tokHtml}</div>
+
+        <div class="zakljucan">
+          <div class="zn">🔒 U punoj verziji</div>
+          <ul>
+            <li>Automatski SMS kupcu: „Vaše gume su gotove za preuzimanje"</li>
+            <li>Depo guma: gdje je koji set uskladišten (regal, sezona)</li>
+            <li>Kreiranje fakture i računa jednim klikom</li>
+            <li>Historija kupca i podsjetnik za sljedeću zamjenu</li>
+          </ul>
+        </div>
+      </div>
+    `;
+    document.getElementById('overlay').classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+
+  function zatvori(){
+    document.getElementById('overlay').classList.remove('open');
+    document.body.style.overflow='';
+  }
+
+  function zakljucano(){
+    alert('Ova sekcija je dostupna u punoj verziji. Javite se da je aktiviramo za vašu firmu.');
+  }
+
+  render();
+</script>
+</body>
+</html>
