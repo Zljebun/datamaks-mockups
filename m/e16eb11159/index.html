@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>AquaShine — Demo prototip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  :root{
+    --pri:#1E40AF; --grad:linear-gradient(135deg,#1e3a8a,#2563eb);
+    --tx:#0f172a; --mut:#64748b; --bg:#f1f5f9; --line:#e6eaf0;
+  }
+  body{ font-family:'Inter',sans-serif; background:var(--bg); color:var(--tx); line-height:1.5; }
+  h1,h2,h3,h4{ font-family:'Plus Jakarta Sans',sans-serif; }
+  .app{ max-width:440px; margin:0 auto; background:var(--bg); min-height:100vh; position:relative; padding-bottom:96px; }
+
+  /* Header */
+  .hdr{ background:var(--grad); color:#fff; padding:16px 16px 18px; }
+  .hdr-top{ display:flex; align-items:center; gap:12px; }
+  .logo{ width:46px; height:46px; border-radius:12px; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:17px; flex-shrink:0; border:1px solid rgba(255,255,255,.2); }
+  .hdr-txt h1{ font-size:18px; font-weight:800; letter-spacing:-.3px; }
+  .hdr-txt p{ font-size:12px; opacity:.82; margin-top:1px; }
+  .demo-badge{ margin-left:auto; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); padding:5px 9px; border-radius:20px; font-size:9.5px; font-weight:600; text-align:center; line-height:1.25; flex-shrink:0; }
+
+  /* Tabs */
+  .tabs{ display:flex; gap:6px; margin-top:16px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab{ background:rgba(255,255,255,.12); color:#fff; border:none; padding:8px 13px; border-radius:10px; font-size:12.5px; font-weight:600; white-space:nowrap; font-family:'Plus Jakarta Sans'; cursor:pointer; }
+  .tab.active{ background:#fff; color:var(--pri); }
+  .tab.lock{ opacity:.72; }
+
+  /* Banner */
+  .banner{ margin:14px 16px 0; background:#fff; border:1px solid var(--line); border-left:3px solid var(--pri); border-radius:12px; padding:11px 13px; font-size:12px; color:var(--mut); }
+  .banner b{ color:var(--tx); }
+
+  /* KPI */
+  .kpis{ display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:14px 16px 4px; }
+  .kpi{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:13px; box-shadow:0 1px 2px rgba(15,23,42,.04); }
+  .kpi .lbl{ font-size:11px; color:var(--mut); font-weight:500; }
+  .kpi .val{ font-family:'Plus Jakarta Sans'; font-weight:800; font-size:23px; margin-top:3px; letter-spacing:-.5px; }
+  .kpi .sub{ font-size:10.5px; margin-top:3px; font-weight:600; }
+  .up{ color:#16a34a; } .neu{ color:var(--mut); }
+  .kpi.wide{ grid-column:1/-1; display:flex; align-items:center; gap:12px; }
+  .kpi.wide .val{ font-size:20px; }
+  .mini-bar{ flex:1; display:flex; align-items:flex-end; gap:5px; height:42px; }
+  .mini-bar span{ flex:1; background:var(--grad); border-radius:3px 3px 0 0; opacity:.85; }
+
+  .sec-title{ padding:16px 16px 8px; display:flex; align-items:center; justify-content:space-between; }
+  .sec-title h2{ font-size:15px; font-weight:700; }
+  .sec-title .cnt{ font-size:11.5px; color:var(--mut); font-weight:600; }
+
+  /* List */
+  .list{ padding:0 16px; display:flex; flex-direction:column; gap:10px; }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px 13px; cursor:pointer; box-shadow:0 1px 2px rgba(15,23,42,.04); display:flex; align-items:center; gap:12px; transition:transform .12s, box-shadow .12s; }
+  .card:active{ transform:scale(.985); }
+  .plate{ width:52px; height:52px; border-radius:11px; background:#eef2ff; color:var(--pri); display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:800; font-family:'Plus Jakarta Sans'; flex-shrink:0; line-height:1.05; }
+  .plate small{ font-size:9px; font-weight:600; opacity:.7; }
+  .plate b{ font-size:15px; }
+  .c-body{ flex:1; min-width:0; }
+  .c-body .name{ font-weight:700; font-size:14px; }
+  .c-body .meta{ font-size:11.5px; color:var(--mut); margin-top:2px; }
+  .c-right{ text-align:right; flex-shrink:0; }
+  .price{ font-weight:800; font-family:'Plus Jakarta Sans'; font-size:14px; }
+  .badge{ display:inline-block; font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; margin-top:4px; }
+  .b-wait{ background:#fef3c7; color:#92400e; }
+  .b-wash{ background:#dbeafe; color:#1e40af; }
+  .b-done{ background:#dcfce7; color:#166534; }
+  .b-paid{ background:#e2e8f0; color:#475569; }
+  .star{ color:#f59e0b; font-size:11px; }
+
+  /* Modal */
+  .overlay{ position:fixed; inset:0; background:rgba(15,23,42,.5); opacity:0; pointer-events:none; transition:.25s; z-index:50; }
+  .overlay.on{ opacity:1; pointer-events:auto; }
+  .sheet{ position:fixed; left:0; right:0; bottom:0; max-width:440px; margin:0 auto; background:#fff; border-radius:20px 20px 0 0; transform:translateY(100%); transition:.28s cubic-bezier(.3,.8,.4,1); z-index:51; max-height:90vh; overflow-y:auto; }
+  .sheet.on{ transform:translateY(0); }
+  .grip{ width:40px; height:4px; background:#cbd5e1; border-radius:3px; margin:10px auto 4px; }
+  .sh-hd{ padding:6px 18px 14px; border-bottom:1px solid var(--line); }
+  .sh-hd .top{ display:flex; align-items:center; gap:12px; }
+  .sh-hd h3{ font-size:18px; font-weight:800; }
+  .sh-hd .who{ font-size:12.5px; color:var(--mut); margin-top:1px; }
+  .sh-body{ padding:16px 18px; }
+  .fields{ display:grid; grid-template-columns:1fr 1fr; gap:12px 10px; }
+  .field .k{ font-size:10.5px; color:var(--mut); font-weight:600; text-transform:uppercase; letter-spacing:.3px; }
+  .field .v{ font-size:14px; font-weight:600; margin-top:2px; }
+  .field.full{ grid-column:1/-1; }
+
+  .flow-t{ font-size:12px; font-weight:700; color:var(--mut); text-transform:uppercase; letter-spacing:.4px; margin:20px 0 10px; }
+  .flow{ display:flex; flex-direction:column; gap:0; }
+  .step{ display:flex; gap:12px; }
+  .step .dot-wrap{ display:flex; flex-direction:column; align-items:center; }
+  .dot{ width:22px; height:22px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-size:11px; color:#94a3b8; flex-shrink:0; }
+  .step.done .dot{ background:#16a34a; color:#fff; }
+  .step.cur .dot{ background:var(--pri); color:#fff; box-shadow:0 0 0 4px rgba(30,64,175,.15); }
+  .line-v{ width:2px; flex:1; background:#e2e8f0; min-height:16px; }
+  .step.done .line-v{ background:#16a34a; }
+  .step .txt{ padding-bottom:14px; }
+  .step .txt .st{ font-weight:700; font-size:13.5px; }
+  .step.cur .txt .st{ color:var(--pri); }
+  .step .txt .tm{ font-size:11px; color:var(--mut); }
+
+  .lockbox{ margin-top:18px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:14px; padding:14px; }
+  .lockbox h4{ font-size:13px; display:flex; align-items:center; gap:6px; }
+  .lockbox p{ font-size:12px; color:var(--mut); margin-top:6px; }
+  .lockbox ul{ margin:8px 0 0 18px; font-size:12px; color:var(--mut); }
+  .lockbox li{ margin:3px 0; }
+
+  /* CTA */
+  .cta{ position:fixed; bottom:16px; right:0; left:0; max-width:440px; margin:0 auto; padding:0 16px; z-index:40; pointer-events:none; text-align:right; }
+  .cta a{ pointer-events:auto; display:inline-flex; align-items:center; gap:7px; background:var(--grad); color:#fff; text-decoration:none; padding:14px 20px; border-radius:14px; font-weight:700; font-family:'Plus Jakarta Sans'; font-size:14px; box-shadow:0 8px 24px rgba(30,64,175,.4); }
+  .foot{ text-align:center; font-size:10.5px; color:#94a3b8; padding:22px 16px 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="logo">AS</div>
+      <div class="hdr-txt">
+        <h1>AquaShine</h1>
+        <p>Praonica automobila · Tuzla</p>
+      </div>
+      <div class="demo-badge">DEMO · izmišljeni<br>podaci</div>
+    </div>
+    <div class="tabs">
+      <button class="tab active">Danas</button>
+      <button class="tab lock" onclick="lock()">🔒 Mušterije</button>
+      <button class="tab lock" onclick="lock()">🔒 Promet</button>
+      <button class="tab lock" onclick="lock()">🔒 Izvještaji</button>
+      <button class="tab lock" onclick="lock()">🔒 SMS podsjetnici</button>
+    </div>
+  </div>
+
+  <div class="banner">
+    Ovo je vaš demo prototip napravljen iz vašeg opisa: svako pranje se evidentira, vidite <b>koliko auta operete dnevno</b>, <b>dnevni promet</b> i <b>ko su stalne mušterije</b>. Puna verzija dodaje bazu mušterija, mjesečne izvještaje i SMS podsjetnike. Za punu verziju javite se.
+  </div>
+
+  <div class="kpis">
+    <div class="kpi">
+      <div class="lbl">Oprano danas</div>
+      <div class="val">17</div>
+      <div class="sub up">↑ 3 više nego jučer</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Dnevni promet</div>
+      <div class="val">385 KM</div>
+      <div class="sub up">↑ prosjek 340 KM</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Stalne mušterije</div>
+      <div class="val">6</div>
+      <div class="sub neu">od 17 danas</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Trenutno u radu</div>
+      <div class="val">3</div>
+      <div class="sub neu">2 čekaju red</div>
+    </div>
+    <div class="kpi wide">
+      <div>
+        <div class="lbl">Ova sedmica</div>
+        <div class="val">2.140 KM</div>
+      </div>
+      <div class="mini-bar">
+        <span style="height:55%"></span><span style="height:70%"></span>
+        <span style="height:45%"></span><span style="height:85%"></span>
+        <span style="height:100%"></span><span style="height:40%"></span>
+        <span style="height:30%"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">
+    <h2>Pranja danas</h2>
+    <span class="cnt">petak, 14. jun</span>
+  </div>
+  <div class="list" id="list"></div>
+
+  <div class="foot">AquaShine demo · Datamaks · svi podaci su izmišljeni radi prikaza</div>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="ov" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="grip"></div>
+  <div class="sh-hd">
+    <div class="top">
+      <div class="plate" id="m-plate"><small></small><b></b></div>
+      <div>
+        <h3 id="m-name"></h3>
+        <div class="who" id="m-car"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sh-body">
+    <div class="fields">
+      <div class="field"><div class="k">Usluga</div><div class="v" id="m-serv"></div></div>
+      <div class="field"><div class="k">Cijena</div><div class="v" id="m-price"></div></div>
+      <div class="field"><div class="k">Vrijeme prijema</div><div class="v" id="m-time"></div></div>
+      <div class="field"><div class="k">Radnik</div><div class="v" id="m-worker"></div></div>
+      <div class="field full"><div class="k">Status mušterije</div><div class="v" id="m-cust"></div></div>
+    </div>
+
+    <div class="flow-t">Tok pranja</div>
+    <div class="flow" id="m-flow"></div>
+
+    <div class="lockbox">
+      <h4>🔒 U punoj verziji</h4>
+      <p>Za ovu mušteriju i svako pranje dobijate još:</p>
+      <ul>
+        <li>Kartica mušterije: historija svih pranja i potrošnja</li>
+        <li>Automatski SMS „Vaše auto je gotovo“</li>
+        <li>Lojalti: svako 10. pranje gratis</li>
+        <li>Mjesečni izvještaj prometa i najčešćih usluga</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="cta">
+  <a href="https://datamaks.net/?utm_source=prototip&utm_medium=selfserve&utm_campaign=demo#kontakt">Napravi punu verziju →</a>
+</div>
+
+<script>
+  function lock(){ alert('Ova sekcija je dostupna u punoj verziji. Javite se da je aktiviramo za vašu firmu.'); }
+
+  const data = [
+    { plate:"J45-A-123", name:"Emir Halilović", car:"VW Passat B8, tamno sivi", serv:"Kompletno pranje (vani + unutra)", price:"25 KM", time:"14:20", worker:"Adnan", status:"wash", cust:"⭐ Stalna mušterija — 11. pranje", step:1 },
+    { plate:"A21-K-778", name:"Jasmina Delić", car:"Škoda Octavia, bijela", serv:"Vanjsko pranje", price:"12 KM", time:"14:05", worker:"Mirza", status:"wash", cust:"Nova mušterija", step:1 },
+    { plate:"M77-J-450", name:"Senad Tabaković", car:"Audi A4, crni", serv:"Pranje + poliranje", price:"45 KM", time:"13:40", worker:"Adnan", status:"wash", cust:"⭐ Stalna mušterija — 8. pranje", step:1 },
+    { plate:"E33-O-091", name:"Dženana Suljić", car:"Renault Clio, crvena", serv:"Kompletno pranje", price:"25 KM", time:"13:10", worker:"Mirza", status:"done", cust:"⭐ Stalna mušterija — 5. pranje", step:2 },
+    { plate:"K12-T-334", name:"Damir Nukić", car:"BMW 320d, plavi", serv:"Vanjsko + tepisi", price:"20 KM", time:"12:35", worker:"Adnan", status:"paid", cust:"Nova mušterija", step:3 },
+    { plate:"O88-E-712", name:"Amela Begić", car:"Ford Focus, srebreni", serv:"Kompletno + vosak", price:"32 KM", time:"11:50", worker:"Mirza", status:"paid", cust:"⭐ Stalna mušterija — 14. pranje", step:3 },
+    { plate:"J45-M-206", name:"Nedžad Karić", car:"Kombi Fiat Ducato", serv:"Vanjsko pranje (veliko vozilo)", price:"28 KM", time:"11:15", worker:"Adnan", status:"paid", cust:"⭐ Stalna mušterija — 22. pranje", step:3 },
+    { plate:"A21-P-559", name:"Lejla Osmanović", car:"Hyundai i20, bijela", serv:"Vanjsko pranje", price:"12 KM", time:"10:40", worker:"Mirza", status:"paid", cust:"Nova mušterija", step:3 }
+  ];
+
+  const badges = {
+    wait:['b-wait','Čeka'], wash:['b-wash','U pranju'],
+    done:['b-done','Gotovo'], paid:['b-paid','Plaćeno']
+  };
+  const steps = ["Primljeno","U pranju","Gotovo","Plaćeno"];
+  const stepTimes = i => ["prijem","pranje","završeno","naplata"][i];
+
+  const list = document.getElementById('list');
+  data.forEach((d,i)=>{
+    const [bc,bt] = badges[d.status];
+    const parts = d.plate.split('-');
+    const star = d.cust.includes('⭐') ? '<span class="star">★</span> ' : '';
+    const el = document.createElement('div');
+    el.className='card';
+    el.onclick=()=>openSheet(i);
+    el.innerHTML = `
+      <div class="plate"><small>${parts[0]}</small><b>${parts[1]}-${parts[2]}</b></div>
+      <div class="c-body">
+        <div class="name">${star}${d.name}</div>
+        <div class="meta">${d.car}</div>
+        <div class="meta">${d.serv}</div>
+      </div>
+      <div class="c-right">
+        <div class="price">${d.price}</div>
+        <span class="badge ${bc}">${bt}</span>
+      </div>`;
+    list.appendChild(el);
+  });
+
+  function openSheet(i){
+    const d = data[i];
+    const parts = d.plate.split('-');
+    document.getElementById('m-plate').innerHTML = `<small>${parts[0]}</small><b>${parts[1]}-${parts[2]}</b>`;
+    document.getElementById('m-name').textContent = d.name;
+    document.getElementById('m-car').textContent = d.car;
+    document.getElementById('m-serv').textContent = d.serv;
+    document.getElementById('m-price').textContent = d.price;
+    document.getElementById('m-time').textContent = d.time;
+    document.getElementById('m-worker').textContent = d.worker;
+    document.getElementById('m-cust').textContent = d.cust;
+
+    const flow = document.getElementById('m-flow');
+    flow.innerHTML='';
+    steps.forEach((s,idx)=>{
+      let cls = idx < d.step ? 'done' : (idx===d.step ? 'cur' : '');
+      const icon = idx < d.step ? '✓' : (idx+1);
+      flow.innerHTML += `
+        <div class="step ${cls}">
+          <div class="dot-wrap">
+            <div class="dot">${icon}</div>
+            ${idx<steps.length-1?'<div class="line-v"></div>':''}
+          </div>
+          <div class="txt">
+            <div class="st">${s}</div>
+            <div class="tm">${idx<=d.step? (idx===d.step?'trenutni korak':'završeno'):'na čekanju'}</div>
+          </div>
+        </div>`;
+    });
+
+    document.getElementById('ov').classList.add('on');
+    document.getElementById('sheet').classList.add('on');
+  }
+  function closeSheet(){
+    document.getElementById('ov').classList.remove('on');
+    document.getElementById('sheet').classList.remove('on');
+  }
+</script>
+</body>
+</html>
