@@ -26,7 +26,7 @@ demo.datamaks.net (index.html: email+telefon+opis+tip)
 
 ### 1. Repo + Pages + DNS
 - Push u GitHub repo `Zljebun/datamaks-mockups`.
-- Settings → Pages: Source = `master` / root. Custom domain = `demo.datamaks.net`.
+- Settings → Pages: Source = `main` / root. Custom domain = `demo.datamaks.net`.
 - Kod registrara `datamaks.net`: DNS **CNAME `demo` → `zljebun.github.io`**.
 
 ### 2. GitHub Secrets (Settings → Secrets and variables → Actions)
