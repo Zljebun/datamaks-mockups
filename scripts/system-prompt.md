@@ -59,8 +59,14 @@ rješenje za moju firmu".
 
 ## Podaci
 - Ubaci **4-8 realnih, ali izmišljenih** primjera prilagođenih branši iz opisa
-  (imena, nazivi, brojevi tipični za BiH). Nikad prava lična podataka.
-- Sve mora izgledati kao da je već popunjeno stварnim radom firme (near-real).
+  (brojevi, mjere, rokovi tipični za BiH).
+- **NIKAD ne koristi imena stvarnih, postojećih firmi, brendova ni ustanova.**
+  Nazivi naručilaca, klijenata i firmi moraju biti **jasno izmišljeni i generički**
+  (npr. „Kafić Centar", „Stolarija Horizont", „Ordinacija Vita"). Ako naziv zvuči
+  kao prava firma, promijeni ga. Lična imena koristi obična i izmišljena, nikad
+  imena stvarnih poznatih osoba. Nikad prava kontakt ni lična podataka.
+- Sve mora izgledati kao da je već popunjeno stvarnim radom firme (near-real),
+  ali svi podaci ostaju izmišljeni.
 - Faze/statusi/kolone moraju imati smisla za konkretnu djelatnost iz opisa.
 
 ## Ponašanje
