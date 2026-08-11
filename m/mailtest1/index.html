@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Kafić Aroma · Zalihe i pazar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  :root {
+    --plava:#1E40AF; --grad:linear-gradient(135deg,#1e3a8a,#2563eb);
+    --tekst:#0f172a; --prig:#64748b; --poz:#f1f5f9; --lin:#e6eaf0;
+  }
+  body { font-family:'Inter',sans-serif; background:var(--poz); color:var(--tekst); line-height:1.5; }
+  .app { max-width:460px; margin:0 auto; background:var(--poz); min-height:100vh; position:relative; padding-bottom:90px; }
+  h1,h2,h3,h4 { font-family:'Plus Jakarta Sans',sans-serif; }
+
+  /* Header */
+  .header { background:var(--grad); color:#fff; padding:16px 16px 18px; position:sticky; top:0; z-index:30; }
+  .htop { display:flex; align-items:center; gap:12px; }
+  .logo { width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:17px; flex-shrink:0; }
+  .hnaziv { flex:1; min-width:0; }
+  .hnaziv h1 { font-size:17px; font-weight:800; }
+  .hnaziv p { font-size:12px; opacity:.85; }
+  .badge { background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:20px; padding:5px 9px; font-size:10px; font-weight:600; white-space:nowrap; align-self:flex-start; }
+
+  /* Tabs */
+  .tabs { display:flex; gap:8px; overflow-x:auto; padding:14px 16px 2px; background:#fff; border-bottom:1px solid var(--lin); position:sticky; top:0; z-index:20; scrollbar-width:none; }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tab { padding:9px 14px; border-radius:10px 10px 0 0; font-size:13px; font-weight:600; color:var(--prig); white-space:nowrap; border:none; background:none; cursor:pointer; }
+  .tab.active { color:var(--plava); border-bottom:2.5px solid var(--plava); }
+  .tab.lock { color:#94a3b8; }
+
+  /* Banner */
+  .banner { margin:14px 16px 0; background:#eff4ff; border:1px solid #dbe4fb; border-radius:12px; padding:12px 14px; font-size:12.5px; color:#334155; }
+  .banner b { color:var(--plava); }
+
+  /* KPI */
+  .kpis { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:14px 16px 4px; }
+  .kpi { background:#fff; border:1px solid var(--lin); border-radius:14px; padding:13px 14px; box-shadow:0 1px 2px rgba(15,23,42,.04); }
+  .kpi .lab { font-size:11px; color:var(--prig); font-weight:500; }
+  .kpi .val { font-size:22px; font-weight:800; font-family:'Plus Jakarta Sans'; margin-top:3px; }
+  .kpi .sub { font-size:11px; margin-top:2px; }
+  .kpi.wide { grid-column:1 / -1; background:var(--grad); color:#fff; border:none; }
+  .kpi.wide .lab { color:rgba(255,255,255,.8); }
+  .up { color:#16a34a; } .down { color:#dc2626; }
+
+  .sekcija-nas { padding:16px 16px 6px; display:flex; align-items:center; justify-content:space-between; }
+  .sekcija-nas h2 { font-size:15px; font-weight:700; }
+  .sekcija-nas span { font-size:11px; color:var(--prig); }
+
+  /* Lista zaliha */
+  .lista { padding:0 16px; display:flex; flex-direction:column; gap:10px; }
+  .stavka { background:#fff; border:1px solid var(--lin); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:12px; cursor:pointer; box-shadow:0 1px 2px rgba(15,23,42,.04); transition:transform .08s; }
+  .stavka:active { transform:scale(.99); }
+  .ikona { width:42px; height:42px; border-radius:11px; background:var(--poz); display:flex; align-items:center; justify-content:center; font-size:21px; flex-shrink:0; }
+  .stavka-info { flex:1; min-width:0; }
+  .stavka-info h3 { font-size:14.5px; font-weight:600; }
+  .bar-wrap { margin-top:6px; height:6px; background:var(--poz); border-radius:6px; overflow:hidden; }
+  .bar { height:100%; border-radius:6px; }
+  .stavka-info .kol { font-size:11.5px; color:var(--prig); margin-top:5px; }
+  .stat { font-size:10.5px; font-weight:700; padding:4px 9px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
+  .s-ok { background:#dcfce7; color:#15803d; }
+  .s-nisko { background:#fef3c7; color:#b45309; }
+  .s-nema { background:#fee2e2; color:#b91c1c; }
+
+  /* Modal */
+  .overlay { position:fixed; inset:0; background:rgba(15,23,42,.5); z-index:50; display:none; align-items:flex-end; justify-content:center; }
+  .overlay.show { display:flex; }
+  .sheet { background:#fff; width:100%; max-width:460px; border-radius:20px 20px 0 0; max-height:92vh; overflow-y:auto; animation:up .28s ease; }
+  @keyframes up { from{ transform:translateY(100%);} to{ transform:translateY(0);} }
+  .sheet-head { position:sticky; top:0; background:#fff; padding:16px 16px 12px; border-bottom:1px solid var(--lin); display:flex; align-items:flex-start; gap:12px; z-index:5; }
+  .sheet-head .ikona { width:48px; height:48px; font-size:24px; }
+  .sheet-head h2 { font-size:17px; font-weight:800; }
+  .sheet-head p { font-size:12px; color:var(--prig); margin-top:2px; }
+  .zatvori { width:42px; height:42px; border-radius:11px; background:var(--poz); border:none; font-size:19px; color:var(--tekst); cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .zatvori:active { background:#e2e8f0; }
+  .sheet-body { padding:16px; }
+
+  .polja { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .polje { background:var(--poz); border-radius:11px; padding:11px 12px; }
+  .polje .l { font-size:10.5px; color:var(--prig); font-weight:500; }
+  .polje .v { font-size:15px; font-weight:700; font-family:'Plus Jakarta Sans'; margin-top:3px; }
+  .polje.full { grid-column:1 / -1; }
+
+  .tok-nas { font-size:13px; font-weight:700; margin-bottom:12px; }
+  .tok { display:flex; flex-direction:column; gap:0; margin-bottom:18px; }
+  .korak { display:flex; gap:12px; }
+  .korak-mark { display:flex; flex-direction:column; align-items:center; }
+  .dot { width:22px; height:22px; border-radius:50%; background:var(--poz); border:2px solid var(--lin); display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--prig); flex-shrink:0; }
+  .korak.done .dot { background:#16a34a; border-color:#16a34a; color:#fff; }
+  .korak.now .dot { background:var(--plava); border-color:var(--plava); color:#fff; }
+  .linija { width:2px; flex:1; background:var(--lin); min-height:14px; }
+  .korak.done .linija { background:#16a34a; }
+  .korak-txt { padding-bottom:16px; }
+  .korak-txt .t { font-size:13.5px; font-weight:600; }
+  .korak.now .korak-txt .t { color:var(--plava); }
+  .korak-txt .d { font-size:11.5px; color:var(--prig); margin-top:1px; }
+
+  .lock-blok { background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:13px 14px; }
+  .lock-blok h4 { font-size:12.5px; font-weight:700; display:flex; align-items:center; gap:6px; }
+  .lock-blok p { font-size:12px; color:var(--prig); margin-top:5px; }
+
+  /* CTA */
+  .cta { position:fixed; bottom:16px; right:16px; left:16px; max-width:428px; margin:0 auto; background:var(--grad); color:#fff; text-decoration:none; padding:15px 18px; border-radius:14px; font-family:'Plus Jakarta Sans'; font-weight:700; font-size:14.5px; text-align:center; box-shadow:0 8px 24px rgba(30,64,175,.35); z-index:40; display:block; }
+</style>
+<script src="/assets/consent.js"></script>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="htop">
+      <div class="logo">KA</div>
+      <div class="hnaziv">
+        <h1>Kafić Aroma</h1>
+        <p>Zalihe pića i dnevni pazar</p>
+      </div>
+      <div class="badge">DEMO · izmišljeni podaci</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active">Zalihe i pazar</button>
+    <button class="tab lock" onclick="lokot()">🔒 Narudžbe</button>
+    <button class="tab lock" onclick="lokot()">🔒 Izvještaji</button>
+    <button class="tab lock" onclick="lokot()">🔒 Dobavljači</button>
+  </div>
+
+  <div class="banner">
+    Ovo je vaš demo prototip napravljen iz vašeg opisa. Na jednom mjestu vidite <b>stanje zaliha</b>, šta treba naručiti i <b>današnji pazar</b>. Puna verzija dodaje automatske narudžbe dobavljačima i mjesečne izvještaje. Za punu verziju javite se.
+  </div>
+
+  <div class="kpis">
+    <div class="kpi wide">
+      <div class="lab">Današnji pazar · srijeda, 11.06.</div>
+      <div class="val">1.284,50 KM</div>
+      <div class="sub" style="color:rgba(255,255,255,.9)">▲ 8% u odnosu na prosjek · 214 računa</div>
+    </div>
+    <div class="kpi">
+      <div class="lab">Za naručiti danas</div>
+      <div class="val down">5 artikala</div>
+      <div class="sub down">2 na nuli</div>
+    </div>
+    <div class="kpi">
+      <div class="lab">Vrijednost zaliha</div>
+      <div class="val">3.760 KM</div>
+      <div class="sub" style="color:var(--prig)">42 artikla ukupno</div>
+    </div>
+  </div>
+
+  <div class="sekcija-nas">
+    <h2>Stanje zaliha pića</h2>
+    <span>dodirni za detalje</span>
+  </div>
+
+  <div class="lista" id="lista"></div>
+
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)zatvori()">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<a class="cta" href="https://datamaks.net/?utm_source=prototip&utm_medium=selfserve&utm_campaign=demo#kontakt">Napravi punu verziju →</a>
+
+<script>
+  const artikli = [
+    { id:1, naziv:"Coca-Cola 0.25L", ikona:"🥤", kat:"Sokovi", stanje:6, min:24, jed:"gajbi", stat:"nema", cijena:"3,00 KM", dobavljac:"Coca-Cola HBC BH", zadnja:"04.06.", potr:"~2 gajbe dnevno" },
+    { id:2, naziv:"Espresso zrno 1kg", ikona:"☕", kat:"Kafa", stanje:3, min:10, jed:"kg", stat:"nisko", cijena:"1,50 KM/šol", dobavljac:"Kafa Vergnano d.o.o.", zadnja:"31.05.", potr:"~1,2 kg dnevno" },
+    { id:3, naziv:"Sarajevsko pivo 0.33L", ikona:"🍺", kat:"Pivo", stanje:2, min:20, jed:"gajbi", stat:"nema", cijena:"3,50 KM", dobavljac:"Sarajevska pivara", zadnja:"05.06.", potr:"~3 gajbe dnevno" },
+    { id:4, naziv:"Voda Sarajevski kiseljak 0.75L", ikona:"💧", kat:"Voda", stanje:9, min:15, jed:"gajbi", stat:"nisko", cijena:"2,50 KM", dobavljac:"Sarajevski kiseljak", zadnja:"06.06.", potr:"~1 gajba dnevno" },
+    { id:5, naziv:"Cedevita naranča 0.5L", ikona:"🧃", kat:"Sokovi", stanje:11, min:12, jed:"gajbi", stat:"nisko", cijena:"3,00 KM", dobavljac:"Atlantic Grupa", zadnja:"03.06.", potr:"~0,5 gajba dnevno" },
+    { id:6, naziv:"Jägermeister 0.7L", ikona:"🥃", kat:"Žestoko", stanje:8, min:4, jed:"flaša", stat:"ok", cijena:"5,00 KM/tura", dobavljac:"MG Mind d.o.o.", zadnja:"28.05.", potr:"~1 flaša / 3 dana" },
+    { id:7, naziv:"Mlijeko za kafu 1L", ikona:"🥛", kat:"Kafa", stanje:14, min:10, jed:"lit", stat:"ok", cijena:"2,20 KM", dobavljac:"Meggle", zadnja:"07.06.", potr:"~2 L dnevno" },
+    { id:8, naziv:"Red Bull 0.25L", ikona:"⚡", kat:"Energetski", stanje:5, min:12, jed:"kom", stat:"nisko", cijena:"4,50 KM", dobavljac:"Orbico d.o.o.", zadnja:"02.06.", potr:"~6 kom dnevno" },
+  ];
+
+  const statMap = {
+    ok:{ txt:"Dovoljno", cls:"s-ok", boja:"#16a34a" },
+    nisko:{ txt:"Naručiti", cls:"s-nisko", boja:"#f59e0b" },
+    nema:{ txt:"Hitno naručiti", cls:"s-nema", boja:"#dc2626" }
+  };
+
+  function render(){
+    const el = document.getElementById('lista');
+    el.innerHTML = artikli.map(a=>{
+      const s = statMap[a.stat];
+      let pct = Math.min(100, Math.round(a.stanje / a.min * 100));
+      if(pct < 6) pct = 6;
+      return `<div class="stavka" onclick="otvori(${a.id})">
+        <div class="ikona">${a.ikona}</div>
+        <div class="stavka-info">
+          <h3>${a.naziv}</h3>
+          <div class="bar-wrap"><div class="bar" style="width:${pct}%;background:${s.boja}"></div></div>
+          <div class="kol">Na stanju: <b>${a.stanje} ${a.jed}</b> · minimum ${a.min}</div>
+        </div>
+        <div class="stat ${s.cls}">${s.txt}</div>
+      </div>`;
+    }).join('');
+  }
+  render();
+
+  function otvori(id){
+    const a = artikli.find(x=>x.id===id);
+    const s = statMap[a.stat];
+    const koraci = [
+      { t:"Zaprimljeno na stanje", d:`Zadnja isporuka ${a.zadnja}`, done:true },
+      { t:"Prodaja i potrošnja", d:a.potr, done:true },
+      { t: a.stat==='ok' ? "Zaliha dovoljna" : "Dostignut minimum", d: a.stat==='ok' ? "Nije potrebna akcija" : `Ispod ${a.min} ${a.jed}`, now: a.stat!=='nema' },
+      { t:"Kreiraj narudžbu", d: a.stat==='nema' ? "Preporučeno odmah" : "Po potrebi", now: a.stat==='nema' },
+      { t:"Isporuka od dobavljača", d:"Čeka se", },
+    ];
+    const html = `
+      <div class="sheet-head">
+        <div class="ikona">${a.ikona}</div>
+        <div style="flex:1;min-width:0">
+          <h2>${a.naziv}</h2>
+          <p>${a.kat} · ${a.dobavljac}</p>
+        </div>
+        <button class="zatvori" onclick="zatvori()">✕</button>
+      </div>
+      <div class="sheet-body">
+        <div class="polja">
+          <div class="polje"><div class="l">Na stanju</div><div class="v">${a.stanje} ${a.jed}</div></div>
+          <div class="polje"><div class="l">Minimum</div><div class="v">${a.min} ${a.jed}</div></div>
+          <div class="polje"><div class="l">Prodajna cijena</div><div class="v">${a.cijena}</div></div>
+          <div class="polje"><div class="l">Zadnja nabavka</div><div class="v">${a.zadnja}</div></div>
+          <div class="polje full"><div class="l">Status</div><div class="v" style="color:${s.boja}">${s.txt}</div></div>
+        </div>
+
+        <div class="tok-nas">Tok artikla</div>
+        <div class="tok">
+          ${koraci.map((k,i)=>`
+            <div class="korak ${k.done?'done':''} ${k.now?'now':''}">
+              <div class="korak-mark">
+                <div class="dot">${k.done?'✓':(i+1)}</div>
+                ${i<koraci.length-1?'<div class="linija"></div>':''}
+              </div>
+              <div class="korak-txt"><div class="t">${k.t}</div><div class="d">${k.d}</div></div>
+            </div>`).join('')}
+        </div>
+
+        <div class="lock-blok">
+          <h4>🔒 Puna verzija</h4>
+          <p>Automatski predlaže količinu za narudžbu i šalje je dobavljaču jednim klikom, uz podsjetnik kada zaliha padne ispod minimuma i predviđanje potrošnje po danima u sedmici.</p>
+        </div>
+      </div>`;
+    document.getElementById('sheet').innerHTML = html;
+    document.getElementById('overlay').classList.add('show');
+    document.getElementById('sheet').scrollTop = 0;
+  }
+
+  function zatvori(){
+    document.getElementById('overlay').classList.remove('show');
+  }
+
+  function lokot(){
+    alert('Ova sekcija je dostupna u punoj verziji. Javite se da je aktiviramo za vašu firmu.');
+  }
+</script>
+</body>
+</html>
