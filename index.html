@@ -93,6 +93,7 @@ form.addEventListener('submit', async (e)=>{
     const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
     const d=await r.json().catch(()=>({}));
     if(r.ok){
+      if(window.gtag) gtag('event','mockup_request',{tip:payload.tip||'(nepoznato)'});
       form.style.display="none";
       msg.className="msg ok";
       msg.innerHTML="<b>Hvala!</b> Vaš prototip se pravi. Za par minuta stiže link na <b>"+payload.email+"</b>. Provjerite i spam/promocije.";
@@ -110,5 +111,6 @@ form.addEventListener('submit', async (e)=>{
   }
 });
 </script>
+<script src="assets/consent.js"></script>
 </body>
 </html>
