@@ -9,7 +9,7 @@ mail, aktivan 24h, pa u arhivu.
 demo.datamaks.net (index.html: email+telefon+opis+tip)
    → Supabase Edge Function (submit): validacija + rate-limit (1 po email+telefon) + upis lead-a + dispatch
    → GitHub Action "Generiši mockup": moderacija (Haiku) → Opus 4.8 → m/{id}/index.html + email
-   → Action "Istek (24h)" (cron): stub + arhiva u Supabase (leads.mockup_html, privatno)
+   → Action "Istek (24h)" (cron): stub + arhiva u Supabase (datamaks_leads.mockup_html, privatno)
 ```
 
 ## Struktura
@@ -35,7 +35,7 @@ demo.datamaks.net (index.html: email+telefon+opis+tip)
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` — iz Supabase projekta.
 
 ### 3. Supabase
-- Pokreni `supabase/leads.sql` u SQL editoru (tabela `leads`).
+- Pokreni `supabase/leads.sql` u SQL editoru (tabela `datamaks_leads`) — WebKraft Supabase projekt.
 - Postavi secrets za funkciju: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
   `GITHUB_TOKEN` (fine-grained, repo `datamaks-mockups`, dozvola „Contents: read/write"
   ili classic sa `repo` scope), `GITHUB_REPO=Zljebun/datamaks-mockups`.
@@ -47,7 +47,7 @@ demo.datamaks.net (index.html: email+telefon+opis+tip)
   `demo.datamaks.net/m/{id}/` radi. Za istek: ručno pokreni „Istek mockupa" workflow.
 
 ## Napomene / caveats
-- **Arhiva & privatnost:** pravi mockup se pri isteku čuva u Supabase (`leads.mockup_html`),
+- **Arhiva & privatnost:** pravi mockup se pri isteku čuva u Supabase (`datamaks_leads.mockup_html`),
   dostupno samo preko service_role ključa (RLS). Repo (može biti javan zbog besplatnog
   Pages-a) NE sadrži ni PII ni arhivu — samo aktivne mockupe (24h), stub i `data/mockups.json`.
 - **Izmjene (Način A):** dodaju se kasnije na `m/{id}/index.html` (klijentski JS,

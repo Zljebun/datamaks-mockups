@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
 
   // Rate-limit: 1 po kombinaciji email+telefon
   const check = await fetch(
-    `${SB}/rest/v1/leads?select=mockup_id&email=eq.${encodeURIComponent(email)}&telefon=eq.${encodeURIComponent(telefon)}`,
+    `${SB}/rest/v1/datamaks_leads?select=mockup_id&email=eq.${encodeURIComponent(email)}&telefon=eq.${encodeURIComponent(telefon)}`,
     { headers: sbHeaders },
   );
   const existing = await check.json().catch(() => []);
@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
   const id = newId();
 
   // Upiši lead (PII ostaje u Supabase, ne u repou)
-  const ins = await fetch(`${SB}/rest/v1/leads`, {
+  const ins = await fetch(`${SB}/rest/v1/datamaks_leads`, {
     method: "POST",
     headers: { ...sbHeaders, Prefer: "return=minimal" },
     body: JSON.stringify({ mockup_id: id, email, telefon, tip, opis, status: "queued" }),

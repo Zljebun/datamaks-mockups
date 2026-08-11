@@ -56,7 +56,7 @@ export async function sendLinkEmail({ to, link }) {
 export async function supabaseUpdateLead(id, fields) {
   const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return;
-  await fetch(`${url}/rest/v1/leads?mockup_id=eq.${id}`, {
+  await fetch(`${url}/rest/v1/datamaks_leads?mockup_id=eq.${id}`, {
     method: "PATCH",
     headers: {
       apikey: key, Authorization: `Bearer ${key}`,

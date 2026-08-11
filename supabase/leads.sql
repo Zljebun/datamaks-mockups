@@ -1,7 +1,7 @@
 -- Tabela lead-ova (PII + arhiva mockupa ostaju u Supabase, NE u git repou).
 -- Pokreni u Supabase SQL editoru.
 
-create table if not exists public.leads (
+create table if not exists public.datamaks_leads (
   id           bigint generated always as identity primary key,
   mockup_id    text unique not null,
   email        text not null,
@@ -15,8 +15,8 @@ create table if not exists public.leads (
 );
 
 -- Brza provjera rate-limita (1 po email+telefon)
-create index if not exists leads_email_telefon_idx on public.leads (email, telefon);
+create index if not exists datamaks_leads_email_telefon_idx on public.datamaks_leads (email, telefon);
 
 -- RLS uključen; pristup samo preko service_role ključa (Edge Function / Action).
 -- Bez javnih polisa → arhiva i PII su privatni.
-alter table public.leads enable row level security;
+alter table public.datamaks_leads enable row level security;
