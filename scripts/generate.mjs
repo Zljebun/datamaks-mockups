@@ -41,6 +41,13 @@ async function generate(opis, tip) {
   const msg = await stream.finalMessage();
   let html = msg.content.filter((b) => b.type === "text").map((b) => b.text).join("").trim();
   if (html.startsWith("```")) html = html.replace(/^```[a-zA-Z]*\n/, "").replace(/\n```$/, "").trim();
+
+  // Ubaci GA4 (consent-gated) za mjerenje otvaranja mockupa (isti kao na formi)
+  const ga = '<script src="/assets/consent.js"></script>';
+  if (html.includes("</head>")) html = html.replace("</head>", ga + "\n</head>");
+  else if (html.includes("</body>")) html = html.replace("</body>", ga + "\n</body>");
+  else html += ga;
+
   return html;
 }
 
