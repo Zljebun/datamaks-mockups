@@ -38,6 +38,7 @@
   {
     "id": "nazivtest1",
     "created_at": "2026-08-11T21:59:19.753Z",
-    "status": "live"
+    "status": "archived",
+    "archived_at": "2026-08-12T22:01:45.789Z"
   }
 ]
