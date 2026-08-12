@@ -3,188 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Link je istekao · Datamaks</title>
 <meta name="robots" content="noindex">
-<title>Knjigo Biro · Demo prototip</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#0f172a;line-height:1.5;padding-bottom:90px}
-.wrap{max-width:440px;margin:0 auto;background:#f1f5f9;min-height:100vh}
-header{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;padding:16px}
-.htop{display:flex;align-items:center;gap:12px}
-.logo{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans';font-weight:800;font-size:15px;flex-shrink:0;border:1px solid rgba(255,255,255,.25)}
-.hname{font-family:'Plus Jakarta Sans';font-weight:800;font-size:17px;line-height:1.2}
-.hsub{font-size:12px;opacity:.85;margin-top:2px}
-.badge{margin-left:auto;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);font-size:9.5px;font-weight:600;padding:5px 8px;border-radius:20px;text-align:center;flex-shrink:0;max-width:96px}
-.tabs{display:flex;gap:6px;overflow-x:auto;padding:12px 16px;background:#fff;border-bottom:1px solid #e6eaf0;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{white-space:nowrap;font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;background:#f1f5f9;color:#64748b;border:none;cursor:pointer;flex-shrink:0}
-.tab.active{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff}
-.banner{margin:14px 16px;background:#eff4ff;border:1px solid #d5e0fb;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#334155}
-.banner b{color:#1E40AF}
-.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px}
-.kpi{background:#fff;border:1px solid #e6eaf0;border-radius:14px;padding:14px}
-.kpi .n{font-family:'Plus Jakarta Sans';font-weight:800;font-size:24px}
-.kpi .l{font-size:11.5px;color:#64748b;margin-top:2px}
-.kpi .n.warn{color:#b45309}
-.kpi .n.ok{color:#15803d}
-.sec{padding:18px 16px 4px;font-family:'Plus Jakarta Sans';font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:space-between}
-.sec .cnt{font-size:11px;color:#64748b;font-weight:500}
-.list{padding:0 16px;display:flex;flex-direction:column;gap:10px}
-.card{background:#fff;border:1px solid #e6eaf0;border-radius:14px;padding:14px;cursor:pointer;transition:.15s}
-.card:active{transform:scale(.99)}
-.crow{display:flex;align-items:center;gap:12px}
-.avt{width:40px;height:40px;border-radius:10px;background:#eff4ff;color:#1E40AF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
-.cname{font-weight:700;font-size:14px}
-.cmeta{font-size:11.5px;color:#64748b;margin-top:1px}
-.st{margin-left:auto;font-size:10.5px;font-weight:600;padding:5px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
-.st.red{background:#fef2f2;color:#b91c1c}
-.st.amber{background:#fffbeb;color:#b45309}
-.st.green{background:#f0fdf4;color:#15803d}
-.st.blue{background:#eff6ff;color:#1d4ed8}
-.docs{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
-.chip{font-size:10.5px;font-weight:600;padding:4px 9px;border-radius:8px;background:#f1f5f9;color:#475569}
-.chip.done{background:#f0fdf4;color:#15803d}
-.chip.miss{background:#fef2f2;color:#b91c1c}
-.cta{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:408px;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;text-align:center;padding:15px;border-radius:14px;font-family:'Plus Jakarta Sans';font-weight:700;font-size:15px;text-decoration:none;box-shadow:0 8px 24px rgba(30,64,175,.35);z-index:50}
-.overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:100;display:none;align-items:flex-end;justify-content:center}
-.overlay.open{display:flex}
-.sheet{background:#f1f5f9;width:100%;max-width:440px;max-height:92vh;border-radius:20px 20px 0 0;overflow-y:auto;animation:up .28s ease}
-@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.shead{position:sticky;top:0;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;padding:16px;display:flex;align-items:flex-start;gap:12px;z-index:2}
-.shead .avt{background:rgba(255,255,255,.16);color:#fff}
-.sh-name{font-family:'Plus Jakarta Sans';font-weight:800;font-size:16px}
-.sh-sub{font-size:12px;opacity:.85;margin-top:2px}
-.close{margin-left:auto;width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.sbody{padding:16px}
-.blk{background:#fff;border:1px solid #e6eaf0;border-radius:14px;padding:14px;margin-bottom:12px}
-.blk h4{font-family:'Plus Jakarta Sans';font-size:13px;margin-bottom:10px;color:#0f172a}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.fld .k{font-size:10.5px;color:#64748b}
-.fld .v{font-size:14px;font-weight:600;margin-top:1px}
-.flow{display:flex;flex-direction:column;gap:0}
-.step{display:flex;gap:11px;align-items:flex-start}
-.step .dot{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:#e6eaf0;color:#94a3b8;position:relative;z-index:1}
-.step.done .dot{background:#15803d;color:#fff}
-.step.now .dot{background:#2563eb;color:#fff;box-shadow:0 0 0 4px #dbeafe}
-.step .line{width:2px;background:#e6eaf0;margin-left:10px;height:14px}
-.step.done+.step .line,.step.done .line{background:#15803d}
-.step .txt{padding-bottom:2px}
-.step .t1{font-size:13px;font-weight:600}
-.step .t2{font-size:11px;color:#64748b}
-.step.now .t1{color:#1d4ed8}
-.lock{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:14px;padding:14px}
-.lock h4{font-family:'Plus Jakarta Sans';font-size:13px;display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.lock p{font-size:12px;color:#64748b}
-.lock ul{margin:8px 0 0 4px;list-style:none}
-.lock li{font-size:12px;color:#475569;padding:3px 0 3px 18px;position:relative}
-.lock li:before{content:"🔒";position:absolute;left:0;font-size:11px}
-.footer{text-align:center;font-size:11px;color:#94a3b8;padding:8px 16px 20px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;color:#0f172a;background:linear-gradient(135deg,#1e3a8a,#2563eb);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{background:#fff;border-radius:18px;box-shadow:0 20px 50px rgba(2,6,23,.3);padding:34px 28px;max-width:460px;text-align:center}
+  .ic{width:60px;height:60px;border-radius:50%;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 18px}
+  h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;margin-bottom:10px}
+  p{color:#64748b;font-size:15px;line-height:1.5;margin-bottom:22px}
+  .cta{display:inline-block;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;text-decoration:none;padding:14px 24px;border-radius:12px;font-weight:700;font-size:15px}
+  .sub{margin-top:16px;font-size:12.5px;color:#94a3b8}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-<div class="htop">
-<div class="logo">KB</div>
-<div>
-<div class="hname">Knjigo Biro Saldo</div>
-<div class="hsub">Knjigovodstveni biro · Zenica</div>
-</div>
-<div class="badge">DEMO · izmišljeni podaci</div>
-</div>
-</header>
-
-<div class="tabs">
-<button class="tab active">Klijenti i knjiženja</button>
-<button class="tab" onclick="lock()">🔒 KIF / KUF registri</button>
-<button class="tab" onclick="lock()">🔒 PDV prijave</button>
-<button class="tab" onclick="lock()">🔒 Lista kupaca</button>
-<button class="tab" onclick="lock()">🔒 Izvještaji</button>
-</div>
-
-<div class="banner">
-Ovo je vaš demo prototip napravljen iz vašeg opisa: svi klijenti biroa na jednom mjestu sa statusom knjiženja za tekući period. Puna verzija dodaje <b>automatske KIF/KUF registre, PDV prijave i evidenciju kupaca sa rokovima</b>. Za punu verziju javite se.
-</div>
-
-<div class="kpis">
-<div class="kpi"><div class="n">18</div><div class="l">Aktivnih klijenata</div></div>
-<div class="kpi"><div class="n warn">5</div><div class="l">Čeka unos dokumenata</div></div>
-<div class="kpi"><div class="n">312</div><div class="l">Faktura ovaj mjesec</div></div>
-<div class="kpi"><div class="n ok">11</div><div class="l">PDV prijava spremno</div></div>
-</div>
-
-<div class="sec">Klijenti · period 11/2024 <span class="cnt">tapni za detalje</span></div>
-<div class="list" id="list"></div>
-
-<div class="footer">Prikazani podaci su izmišljeni i služe samo za demonstraciju.</div>
-</div>
-
-<a class="cta" href="https://datamaks.net/?utm_source=prototip&utm_medium=selfserve&utm_campaign=demo#kontakt">Napravi punu verziju →</a>
-
-<div class="overlay" id="ov" onclick="if(event.target===this)zatvori()">
-<div class="sheet" id="sheet"></div>
-</div>
-
-<script>
-function lock(){alert('Ova sekcija je dostupna u punoj verziji. Javite se da je aktiviramo za vašu firmu.');}
-
-var data=[
-{ini:"MP",name:"Merkur Promet d.o.o.",id:"ID 4218763450006",st:"Čeka unos",stc:"red",kif:24,kuf:18,kifOk:true,kufOk:false,kupci:37,pdv:"do 10.12.",step:1,
-docs:[["KIF unesen","done"],["KUF nedostaje","miss"],["PDV prijava","pending"]]},
-{ini:"GK",name:"Gradnja Kod Nas",id:"ID 4200981220003",st:"U obradi",stc:"amber",kif:12,kuf:31,kifOk:true,kufOk:true,kupci:14,pdv:"do 10.12.",step:2,
-docs:[["KIF unesen","done"],["KUF unesen","done"],["PDV kontrola","pending"]]},
-{ini:"AT",name:"Aroma Trade s.p.",id:"ID 4301122667001",st:"PDV spremno",stc:"green",kif:41,kuf:29,kifOk:true,kufOk:true,kupci:52,pdv:"predano",step:4,
-docs:[["KIF unesen","done"],["KUF unesen","done"],["PDV prijava","done"]]},
-{ini:"NL",name:"Nova Linija Frizerski",id:"ID 4302778910002",st:"Čeka unos",stc:"red",kif:0,kuf:6,kifOk:false,kufOk:true,kupci:8,pdv:"do 10.12.",step:0,
-docs:[["KIF nedostaje","miss"],["KUF unesen","done"],["PDV prijava","pending"]]},
-{ini:"BH",name:"BH Auto Servis",id:"ID 4218440051009",st:"U obradi",stc:"amber",kif:19,kuf:22,kifOk:true,kufOk:false,kupci:63,pdv:"do 10.12.",step:1,
-docs:[["KIF unesen","done"],["KUF djelimično","miss"],["PDV prijava","pending"]]},
-{ini:"ES",name:"Enter Soft d.o.o.",id:"ID 4200556098007",st:"PDV spremno",stc:"green",kif:8,kuf:5,kifOk:true,kufOk:true,kupci:11,pdv:"do 10.12.",step:3,
-docs:[["KIF unesen","done"],["KUF unesen","done"],["PDV prijava","pending"]]},
-{ini:"DL",name:"Dukat Line Transport",id:"ID 4209871230004",st:"Završeno",stc:"blue",kif:33,kuf:47,kifOk:true,kufOk:true,kupci:29,pdv:"predano",step:4,
-docs:[["KIF unesen","done"],["KUF unesen","done"],["Knjiženje zaključeno","done"]]}
-];
-
-var steps=["Prijem dokumenata","Unos KIF (izlazne)","Unos KUF (ulazne)","Kontrola i PDV prijava"];
-var stepSub=["Klijent dostavlja fakture i izvode","Knjiženje izlaznih faktura u KIF","Knjiženje ulaznih faktura u KUF","Provjera salda i predaja UINO"];
-
-function render(){
-var h="";
-data.forEach(function(c,i){
-var dchips=c.docs.map(function(d){var cl=d[1]==="done"?"done":d[1]==="miss"?"miss":"";return '<span class="chip '+cl+'">'+d[0]+'</span>';}).join("");
-h+='<div class="card" onclick="otvori('+i+')"><div class="crow"><div class="avt">'+c.ini+'</div><div><div class="cname">'+c.name+'</div><div class="cmeta">'+c.id+' · '+c.kupci+' kupaca</div></div><span class="st '+c.stc+'">'+c.st+'</span></div><div class="docs">'+dchips+'</div></div>';
-});
-document.getElementById('list').innerHTML=h;
-}
-render();
-
-function otvori(i){
-var c=data[i];
-var flow="";
-for(var s=0;s<steps.length;s++){
-var cls=s<c.step?"done":s===c.step?"now":"";
-flow+='<div class="step '+cls+'"><div style="display:flex;flex-direction:column;align-items:center"><div class="dot">'+(s<c.step?"✓":(s+1))+'</div>'+(s<steps.length-1?'<div class="line"></div>':'')+'</div><div class="txt"><div class="t1">'+steps[s]+'</div><div class="t2">'+stepSub[s]+'</div></div></div>';
-}
-var html=
-'<div class="shead"><div class="avt">'+c.ini+'</div><div><div class="sh-name">'+c.name+'</div><div class="sh-sub">'+c.id+' · period 11/2024</div></div><button class="close" onclick="zatvori()">✕</button></div>'+
-'<div class="sbody">'+
-'<div class="blk"><h4>Pregled knjiženja</h4><div class="grid2">'+
-'<div class="fld"><div class="k">KIF · izlazne fakture</div><div class="v" style="color:'+(c.kifOk?'#15803d':'#b91c1c')+'">'+c.kif+' stavki</div></div>'+
-'<div class="fld"><div class="k">KUF · ulazne fakture</div><div class="v" style="color:'+(c.kufOk?'#15803d':'#b91c1c')+'">'+c.kuf+' stavki</div></div>'+
-'<div class="fld"><div class="k">Kupci u evidenciji</div><div class="v">'+c.kupci+'</div></div>'+
-'<div class="fld"><div class="k">Rok PDV prijave</div><div class="v">'+c.pdv+'</div></div>'+
-'</div></div>'+
-'<div class="blk"><h4>Tok obrade za ovaj period</h4><div class="flow">'+flow+'</div></div>'+
-'<div class="lock"><h4>🔒 Dostupno u punoj verziji</h4><p>Za ovog klijenta puna verzija automatski vodi:</p><ul><li>KIF i KUF registar sa automatskim rednim brojevima</li><li>Generisanje PDV prijave i eksport za UINO</li><li>Lista kupaca sa saldima i dospijećima</li><li>Podsjetnici za dostavu dokumenata i rokove</li></ul></div>'+
-'</div>';
-document.getElementById('sheet').innerHTML=html;
-document.getElementById('ov').classList.add('open');
-document.getElementById('sheet').scrollTop=0;
-}
-function zatvori(){document.getElementById('ov').classList.remove('open');}
-</script>
+  <div class="card">
+    <div class="ic">⏳</div>
+    <h1>Ovaj prototip je istekao</h1>
+    <p>Demo prototipi su dostupni 24 sata. Ako želite ponovo vidjeti svoj prototip ili napraviti punu verziju za svoju firmu, javite se — čuvamo ga kod sebe.</p>
+    <a class="cta" href="https://datamaks.net/?utm_source=prototip&utm_medium=selfserve&utm_campaign=istekao#kontakt">Javite se za punu verziju →</a>
+    <div class="sub">Datamaks · Vaš posao. Vaš softver.</div>
+  </div>
 </body>
 </html>
