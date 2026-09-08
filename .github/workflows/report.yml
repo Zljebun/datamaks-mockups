@@ -1,0 +1,27 @@
+name: Datamaks izvjestaj (kampanja + sajt)
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'   # svaki parni sat (UTC); GitHub cron zna kasniti
+  workflow_dispatch: {}      # rucno pokretanje po potrebi
+
+jobs:
+  izvjestaj:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Zavisnosti
+        run: pip install --quiet requests cryptography
+      - name: GA4 kljuc iz secreta
+        run: printf '%s' "$GA" > report/ga-service-account.json
+        env:
+          GA: ${{ secrets.GA_SERVICE_ACCOUNT }}
+      - name: Pokreni izvjestaj
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          META_USER_TOKEN: ${{ secrets.META_USER_TOKEN }}
+          TZ: Europe/Sarajevo
+        run: python report/report.py
