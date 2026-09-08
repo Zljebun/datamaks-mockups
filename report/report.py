@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Datamaks izvjestaj (kampanja + sajt) -> ntfy, svaka 2 sata.
 GA4 preko service accounta (isti kljuc kao GSC cuvar), Meta preko META_USER_TOKEN iz env-a."""
-import json, time, base64, os
+import json, time, base64, os, smtplib
+from email.message import EmailMessage
 import requests
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
@@ -20,6 +21,28 @@ CAMP = "120248942133150208"
 NTFY = "https://ntfy.sh/datamaks-izvjestaj-9x4k"
 META_TOKEN = os.environ.get("META_USER_TOKEN", "")
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+SMTP_HOST = os.environ.get("SMTP_HOST", "")
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "465") or 465)
+SMTP_USER = os.environ.get("SMTP_USER", "")
+SMTP_PASS = os.environ.get("SMTP_PASS", "")
+MAIL_TO = "info@datamaks.net"
+
+
+def posalji_mail(subject, body):
+    if not (SMTP_HOST and SMTP_USER and SMTP_PASS):
+        return "(mail preskocen: nema SMTP)"
+    m = EmailMessage()
+    m["From"] = SMTP_USER
+    m["To"] = MAIL_TO
+    m["Subject"] = subject
+    m.set_content(body)
+    try:
+        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=30) as s:
+            s.login(SMTP_USER, SMTP_PASS)
+            s.send_message(m)
+        return "mail poslat"
+    except Exception as e:
+        return f"(mail greska: {str(e)[:80]})"
 
 
 def claude_analiza(kmp, sajt):
@@ -150,13 +173,18 @@ def main():
         lines.append("\nANALIZA:\n" + analiza)
 
     msg = "\n".join(lines)
+    # ntfy (ostaje, bezopasno)
     try:
         requests.post(NTFY, data=msg.encode("utf-8"),
                       headers={"Title": f"Datamaks izvjestaj {now}",
                                "Tags": "bar_chart", "Priority": "low"}, timeout=20)
     except Exception as e:
         print("ntfy err", e)
+    # email (primarni kanal)
+    mail_status = posalji_mail(f"Datamaks izvjestaj {now}", msg)
     print(msg)
+    print("---")
+    print("mail:", mail_status)
 
 
 if __name__ == "__main__":
