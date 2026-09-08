@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Datamaks izvjestaj (kampanja + sajt) -> ntfy, svaka 2 sata.
-GA4 preko service accounta (isti kljuc kao GSC cuvar), Meta preko META_USER_TOKEN iz env-a."""
+"""Datamaks izvjestaj (kampanja + sajt) -> email (+ ntfy), 3x dnevno.
+GA4 preko service accounta, Meta preko META_USER_TOKEN, analiza preko Claude (Opus 4.8)."""
 import json, time, base64, os, smtplib
 from email.message import EmailMessage
 import requests
@@ -28,54 +28,7 @@ SMTP_PASS = os.environ.get("SMTP_PASS", "")
 MAIL_TO = "info@datamaks.net"
 
 
-def posalji_mail(subject, body):
-    if not (SMTP_HOST and SMTP_USER and SMTP_PASS):
-        return "(mail preskocen: nema SMTP)"
-    m = EmailMessage()
-    m["From"] = SMTP_USER
-    m["To"] = MAIL_TO
-    m["Subject"] = subject
-    m.set_content(body)
-    try:
-        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=30) as s:
-            s.login(SMTP_USER, SMTP_PASS)
-            s.send_message(m)
-        return "mail poslat"
-    except Exception as e:
-        return f"(mail greska: {str(e)[:80]})"
-
-
-def claude_analiza(kmp, sajt):
-    if not ANTHROPIC_KEY:
-        return ""
-    sys_prompt = ("Ti si marketing analiticar za Datamaks (digitalizacija MSP, Banja Luka + AT/EU). "
-                  "Dobijas dnevne brojke Meta kampanje (prototip namjestaja) i sajta. "
-                  "Napisi kratku analizu na bosanskom, 2 do 4 recenice, konkretno i korisno direktoru (Milanu): "
-                  "je li kanal zdrav, sta je usko grlo, treba li sta poduzeti. Bez uvoda i bez crtica u tekstu.")
-    user = (f"KAMPANJA danas: {kmp}\nSAJT danas: {sajt}\n\n"
-            "Kontekst: ciljani budzet 10 EUR/dan; split-test je presudjen (radi samo set A Landing Views, "
-            "ostalo pauzirano); glavno usko grlo su konverzije (nova landing forma + Viber/WhatsApp/poziv dugmad "
-            "su nedavno postavljeni; Viber i telefonski kontakti se NE mjere u GA4).")
-    body = {"model": "claude-opus-4-8", "max_tokens": 400,
-            "system": sys_prompt,
-            "output_config": {"effort": "low"},
-            "messages": [{"role": "user", "content": user}]}
-    try:
-        r = requests.post("https://api.anthropic.com/v1/messages",
-                          headers={"x-api-key": ANTHROPIC_KEY,
-                                   "anthropic-version": "2023-06-01",
-                                   "content-type": "application/json"},
-                          json=body, timeout=60)
-        j = r.json()
-        if isinstance(j, dict) and j.get("content"):
-            return "".join(b.get("text", "") for b in j["content"] if b.get("type") == "text").strip()
-        if isinstance(j, dict) and "error" in j:
-            return f"(analiza greska: {str(j['error'])[:60]})"
-    except Exception as e:
-        return f"(analiza greska: {str(e)[:60]})"
-    return ""
-
-
+# ---------- GA4 auth ----------
 def _b64(b):
     return base64.urlsafe_b64encode(b).rstrip(b"=")
 
@@ -103,46 +56,73 @@ def ga_post(path, body):
     return r.json()
 
 
-def meta_today():
+# ---------- Meta ----------
+def meta_insights(preset):
     if not META_TOKEN:
         return {"err": "nema tokena"}
     url = f"https://graph.facebook.com/v21.0/{CAMP}/insights"
-    p = {"date_preset": "today",
-         "fields": "spend,impressions,ctr,clicks,cpc,actions",
+    p = {"date_preset": preset,
+         "fields": "spend,impressions,reach,clicks,ctr,cpc,actions",
          "access_token": META_TOKEN}
     j = requests.get(url, params=p, timeout=30).json()
     if "error" in j:
         return {"err": j["error"].get("message", "")[:70]}
     rows = j.get("data", [])
     if not rows:
-        return {"spend": 0.0, "ctr": 0.0, "lpv": 0}
+        return {"spend": 0.0, "imp": 0, "reach": 0, "clicks": 0, "ctr": 0.0, "cpc": 0.0, "lpv": 0, "linkclk": 0}
     d = rows[0]
-    lpv = 0
+    lpv = linkclk = 0
     for a in d.get("actions", []):
         if a.get("action_type") == "landing_page_view":
             lpv = int(float(a["value"]))
-    return {"spend": float(d.get("spend", 0)), "ctr": float(d.get("ctr", 0) or 0),
-            "clicks": d.get("clicks", "0"), "lpv": lpv}
+        elif a.get("action_type") == "link_click":
+            linkclk = int(float(a["value"]))
+    return {"spend": float(d.get("spend", 0)), "imp": int(d.get("impressions", 0)),
+            "reach": int(d.get("reach", 0)), "clicks": int(d.get("clicks", 0)),
+            "ctr": float(d.get("ctr", 0) or 0), "cpc": float(d.get("cpc", 0) or 0),
+            "lpv": lpv, "linkclk": linkclk}
 
 
-def ga_today():
-    body = {"dateRanges": [{"startDate": "today", "endDate": "today"}],
-            "dimensions": [{"name": "sessionSource"}, {"name": "sessionMedium"}],
-            "metrics": [{"name": "sessions"}, {"name": "conversions"}],
-            "orderBys": [{"metric": {"metricName": "sessions"}, "desc": True}],
-            "limit": 25}
-    r = ga_post("runReport", body)
-    tot = fbpaid = conv = 0
+# ---------- GA4 upiti ----------
+def ga_totals(start, end):
+    r = ga_post("runReport", {"dateRanges": [{"startDate": start, "endDate": end}],
+                              "metrics": [{"name": "sessions"}, {"name": "activeUsers"},
+                                          {"name": "screenPageViews"}, {"name": "engagementRate"},
+                                          {"name": "conversions"}]})
+    rows = r.get("rows", [])
+    if not rows:
+        return {"sess": 0, "users": 0, "pv": 0, "eng": 0.0, "conv": 0}
+    m = [x["value"] for x in rows[0]["metricValues"]]
+    return {"sess": int(m[0]), "users": int(m[1]), "pv": int(m[2]),
+            "eng": float(m[3]) * 100, "conv": int(float(m[4]))}
+
+
+def ga_sources(start, end, limit=6):
+    r = ga_post("runReport", {"dateRanges": [{"startDate": start, "endDate": end}],
+                              "dimensions": [{"name": "sessionSource"}, {"name": "sessionMedium"}],
+                              "metrics": [{"name": "sessions"}, {"name": "conversions"}],
+                              "orderBys": [{"metric": {"metricName": "sessions"}, "desc": True}],
+                              "limit": limit})
+    out = []
     for row in r.get("rows", []):
-        src = row["dimensionValues"][0]["value"]
-        med = row["dimensionValues"][1]["value"]
-        s = int(row["metricValues"][0]["value"])
-        c = float(row["metricValues"][1]["value"])
-        tot += s
-        conv += c
-        if src == "facebook" and med == "paid":
-            fbpaid += s
-    return tot, fbpaid, int(conv)
+        d = [x["value"] for x in row["dimensionValues"]]
+        m = [x["value"] for x in row["metricValues"]]
+        out.append((f"{d[0]}/{d[1]}", int(m[0]), int(float(m[1]))))
+    return out
+
+
+def ga_pages(start, end, limit=6):
+    r = ga_post("runReport", {"dateRanges": [{"startDate": start, "endDate": end}],
+                              "dimensions": [{"name": "pagePath"}],
+                              "metrics": [{"name": "screenPageViews"}, {"name": "activeUsers"}],
+                              "orderBys": [{"metric": {"metricName": "screenPageViews"}, "desc": True}],
+                              "limit": limit})
+    out = []
+    for row in r.get("rows", []):
+        d = row["dimensionValues"][0]["value"]
+        m = [x["value"] for x in row["metricValues"]]
+        out.append((d[:44], int(m[0]), int(m[1])))
+    return out
 
 
 def ga_active():
@@ -150,41 +130,118 @@ def ga_active():
     return sum(int(x["metricValues"][0]["value"]) for x in r.get("rows", []))
 
 
-def main():
-    now = time.strftime("%H:%M")
-    lines = []
-    m = meta_today()
-    if "err" in m:
-        kmp = f"greska ({m['err']})"
-    else:
-        cpl = (m["spend"] / m["lpv"]) if m["lpv"] else 0
-        kmp = f"{m['spend']:.2f}EUR · CTR {m['ctr']:.2f}% · {m['lpv']} LPV · {cpl:.3f}EUR/LPV"
-    lines.append("KAMPANJA danas: " + kmp)
+# ---------- Claude analiza ----------
+def claude_analiza(summary):
+    if not ANTHROPIC_KEY:
+        return ""
+    sys_prompt = ("Ti si marketing analiticar za Datamaks (digitalizacija MSP, Banja Luka + AT/EU). "
+                  "Dobijas detaljan dnevni izvjestaj Meta kampanje (prototip namjestaja) i sajta. "
+                  "Napisi analizu na bosanskom, 4 do 6 recenica: je li kanal zdrav, sta se promijenilo u odnosu na jucer, "
+                  "gdje je usko grlo, i 1 do 2 konkretna prijedloga sta poduzeti. Bez uvoda i bez crtica u tekstu.")
+    user = (summary + "\n\nKontekst: ciljani budzet 10 EUR/dan; split-test presudjen (radi samo set A Landing Views, "
+            "ostalo pauzirano); glavno usko grlo su konverzije (nova landing forma + Viber/WhatsApp/poziv dugmad nedavno "
+            "postavljeni; Viber i telefonski kontakti se NE mjere u GA4 pa je 0 konverzija moguce laznо nisko).")
+    body = {"model": "claude-opus-4-8", "max_tokens": 600,
+            "system": sys_prompt, "output_config": {"effort": "low"},
+            "messages": [{"role": "user", "content": user}]}
     try:
-        tot, fbpaid, conv = ga_today()
-        active = ga_active()
-        sajt = f"{tot} sesija · FB/paid {fbpaid} · konv {conv} · sada {active} aktivnih"
+        r = requests.post("https://api.anthropic.com/v1/messages",
+                          headers={"x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01",
+                                   "content-type": "application/json"},
+                          json=body, timeout=90)
+        j = r.json()
+        if isinstance(j, dict) and j.get("content"):
+            return "".join(b.get("text", "") for b in j["content"] if b.get("type") == "text").strip()
+        if isinstance(j, dict) and "error" in j:
+            return f"(analiza greska: {str(j['error'])[:60]})"
     except Exception as e:
-        sajt = f"greska ({str(e)[:60]})"
-    lines.append("SAJT danas: " + sajt)
+        return f"(analiza greska: {str(e)[:60]})"
+    return ""
 
-    analiza = claude_analiza(kmp, sajt)
-    if analiza:
-        lines.append("\nANALIZA:\n" + analiza)
 
-    msg = "\n".join(lines)
-    # ntfy (ostaje, bezopasno)
+# ---------- Email ----------
+def posalji_mail(subject, body):
+    if not (SMTP_HOST and SMTP_USER and SMTP_PASS):
+        return "(mail preskocen: nema SMTP)"
+    m = EmailMessage()
+    m["From"] = SMTP_USER
+    m["To"] = MAIL_TO
+    m["Subject"] = subject
+    m.set_content(body)
+    try:
+        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=30) as s:
+            s.login(SMTP_USER, SMTP_PASS)
+            s.send_message(m)
+        return "mail poslat"
+    except Exception as e:
+        return f"(mail greska: {str(e)[:80]})"
+
+
+def main():
+    now = time.strftime("%d.%m. %H:%M")
+    L = []
+
+    # === KAMPANJA ===
+    L.append("=== KAMPANJA (Namjestaj Test) ===")
+    md = meta_insights("today")
+    my = meta_insights("yesterday")
+    if "err" in md:
+        L.append(f"danas: greska ({md['err']})")
+        kmp_head = f"greska ({md['err']})"
+    else:
+        cpl = (md["spend"] / md["lpv"]) if md["lpv"] else 0
+        kmp_head = f"{md['spend']:.2f}EUR potroseno (cilj 10EUR/dan)"
+        L.append(f"Danas: {md['spend']:.2f}EUR / cilj 10EUR")
+        L.append(f"  prikazi {md['imp']} · doseg {md['reach']} · klikovi {md['clicks']} · CTR {md['ctr']:.2f}% · CPC {md['cpc']:.3f}EUR")
+        L.append(f"  LPV (posjete landingu) {md['lpv']} · {cpl:.3f}EUR/LPV · link klik {md['linkclk']}")
+        if "err" not in my:
+            cply = (my["spend"] / my["lpv"]) if my["lpv"] else 0
+            L.append(f"Juce (poredjenje): {my['spend']:.2f}EUR · CTR {my['ctr']:.2f}% · {my['lpv']} LPV · {cply:.3f}EUR/LPV")
+
+    # === SAJT DANAS ===
+    L.append("")
+    L.append("=== SAJT (danas) ===")
+    try:
+        td = ga_totals("today", "today")
+        active = ga_active()
+        L.append(f"sesije {td['sess']} · korisnici {td['users']} · pregledi {td['pv']} · engagement {td['eng']:.0f}% · konverzije {td['conv']}")
+        L.append(f"aktivni sada: {active}")
+        src = ga_sources("today", "today", 5)
+        if src:
+            L.append("izvori danas: " + "; ".join(f"{s} {n}" for s, n, c in src))
+    except Exception as e:
+        L.append(f"greska ({str(e)[:60]})")
+
+    # === SAJT 7 DANA ===
+    L.append("")
+    L.append("=== SAJT (7 dana) ===")
+    try:
+        t7 = ga_totals("7daysAgo", "today")
+        L.append(f"ukupno: sesije {t7['sess']} · korisnici {t7['users']} · pregledi {t7['pv']} · konverzije {t7['conv']}")
+        L.append("izvori:")
+        for s, n, c in ga_sources("7daysAgo", "today", 6):
+            L.append(f"  {n:>3} {s}" + (f" (konv {c})" if c else ""))
+        L.append("top stranice:")
+        for p, v, u in ga_pages("7daysAgo", "today", 6):
+            L.append(f"  {v:>3} pregleda / {u} kor · {p}")
+    except Exception as e:
+        L.append(f"greska ({str(e)[:60]})")
+
+    body_numbers = "\n".join(L)
+    analiza = claude_analiza(body_numbers)
+    msg = body_numbers + ("\n\n=== ANALIZA (Claude) ===\n" + analiza if analiza else "")
+
+    # ntfy (kratki naslov + puni tekst)
     try:
         requests.post(NTFY, data=msg.encode("utf-8"),
                       headers={"Title": f"Datamaks izvjestaj {now}",
                                "Tags": "bar_chart", "Priority": "low"}, timeout=20)
     except Exception as e:
         print("ntfy err", e)
-    # email (primarni kanal)
-    mail_status = posalji_mail(f"Datamaks izvjestaj {now}", msg)
+
+    mail_status = posalji_mail(f"Datamaks izvjestaj {now} · {kmp_head}", msg)
     print(msg)
-    print("---")
-    print("mail:", mail_status)
+    print("---\nmail:", mail_status)
 
 
 if __name__ == "__main__":
