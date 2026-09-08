@@ -138,9 +138,12 @@ def claude_analiza(summary):
                   "Dobijas detaljan dnevni izvjestaj Meta kampanje (prototip namjestaja) i sajta. "
                   "Napisi analizu na bosanskom, 4 do 6 recenica: je li kanal zdrav, sta se promijenilo u odnosu na jucer, "
                   "gdje je usko grlo, i 1 do 2 konkretna prijedloga sta poduzeti. Bez uvoda i bez crtica u tekstu.")
-    user = (summary + "\n\nKontekst: ciljani budzet 10 EUR/dan; split-test presudjen (radi samo set A Landing Views, "
-            "ostalo pauzirano); glavno usko grlo su konverzije (nova landing forma + Viber/WhatsApp/poziv dugmad nedavno "
-            "postavljeni; Viber i telefonski kontakti se NE mjere u GA4 pa je 0 konverzija moguce laznо nisko).")
+    user = (summary + "\n\nKontekst: ciljani budzet 10 EUR/dan; split-test presudjen (radi samo set A Landing Views, ostalo pauzirano). "
+            "OD 2026-09-08 mjerenje je POSTAVLJENO: klikovi na Viber/WhatsApp/poziv i slanje forme se biljeze kao GA4 eventi "
+            "(kontakt_klik, lead_form_submit) i kao Meta Pixel Lead, pa se konverzije sada vide (mali pocetni brojevi su moguce "
+            "vlasnikovi testovi iz Beca). Ponuda je Viber-first (Varijanta B: 'opisite procese, isti dan dobijate prototip za vasu proizvodnju'). "
+            "NE predlazi ponovo postavljanje mjerenja jer je vec uradjeno. Fokus: da li broj kontakata (kontakt_klik) raste i dolazi li iz BiH gradova "
+            "(Bec = vlasnik, ne lead). Meta kampanja ostaje na cilju 'posjete' dok se ne skupi baza konverzija, pa se onda prebacuje na 'upite'.")
     body = {"model": "claude-opus-4-8", "max_tokens": 600,
             "system": sys_prompt, "output_config": {"effort": "low"},
             "messages": [{"role": "user", "content": user}]}
