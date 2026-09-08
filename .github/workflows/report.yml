@@ -2,8 +2,8 @@ name: Datamaks izvjestaj (kampanja + sajt)
 
 on:
   schedule:
-    - cron: '0 */2 * * *'   # svaki parni sat (UTC); GitHub cron zna kasniti
-  workflow_dispatch: {}      # rucno pokretanje po potrebi
+    - cron: '0 6,12,18 * * *'   # 3x dnevno: jutro/popodne/vece (UTC 06/12/18 -> ljeti 08/14/20, zimi 07/13/19); GitHub cron zna kasniti
+  workflow_dispatch: {}          # rucno pokretanje po potrebi
 
 jobs:
   izvjestaj:
