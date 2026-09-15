@@ -142,7 +142,37 @@
   .frow input:focus,.frow select:focus,.frow textarea:focus{outline:none;border-color:var(--brand2)}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   @media(max-width:560px){.row2{grid-template-columns:1fr}}
+  .bar.clk{cursor:pointer;border-radius:8px;padding:4px 6px;margin:5px -6px}
+  .bar.clk:hover{background:var(--track)}
+  .listrow-wrap{max-width:100%}
   footer{padding:16px 20px;color:var(--muted);font-size:12px;text-align:center}
+
+  /* Telefon: tabela „Sve narudžbe" postaje kartice (label: vrijednost) */
+  @media(max-width:640px){
+    .tbl{border:0;background:transparent}
+    .tbl thead{display:none}
+    .tbl tbody tr{display:block;margin-bottom:10px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+    .tbl tbody td{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 13px;text-align:right}
+    .tbl tbody td::before{content:attr(data-label);color:var(--muted);font-size:12px;font-weight:600;text-align:left;flex:0 0 auto}
+    .tbl tbody td:not(:last-child){border-bottom:1px solid var(--track)}
+    .filterbar input{flex:1 1 100%}
+  }
+  /* Telefon: detaljan pregled narudžbe */
+  @media(max-width:560px){
+    .overlay{padding:0}
+    .modal{border-radius:0;min-height:100vh}
+    .mhead{padding:14px 16px}
+    .mhead h2{font-size:17px}
+    .mbody{padding:16px 16px}
+    .kv{flex-direction:column;gap:1px;padding:7px 0}
+    .kv .k{width:auto;font-size:12.5px}
+    .kv .v{font-size:14px}
+    .stepper{gap:2px}
+    .step{font-size:11px}
+    .step .arr{display:none}
+    .actions{padding:12px 16px}
+    .actions button.primary{flex:1 1 100%}
+  }
 </style>
 </head>
 <body>
@@ -252,11 +282,11 @@ function kpiRow(){
   const spremno=NAR.filter(n=>n.faza===3).length;
   const sutra=NAR.filter(n=>!isDone(n)&&n.offset===1).length;
   return '<div class="kpis">'+
-    '<div class="kpi" onclick="setView(\'tabla\')"><div class="big">'+aktivni+'</div><div class="lab">Aktivne narudžbe</div></div>'+
-    '<div class="kpi '+(danas?"gold":"")+'" onclick="setView(\'danas\')"><div class="big">'+danas+'</div><div class="lab">Za danas</div></div>'+
-    '<div class="kpi '+(kasni?"warn":"")+'" onclick="setView(\'danas\')"><div class="big">'+kasni+'</div><div class="lab">Kasni</div></div>'+
-    '<div class="kpi" onclick="setView(\'tabla\')"><div class="big">'+spremno+'</div><div class="lab">Spremno za preuzimanje</div></div>'+
-    '<div class="kpi" onclick="setView(\'danas\')"><div class="big">'+sutra+'</div><div class="lab">Za sutra</div></div>'+
+    '<div class="kpi" onclick="openKpi(\'aktivni\')"><div class="big">'+aktivni+'</div><div class="lab">Aktivne narudžbe</div></div>'+
+    '<div class="kpi '+(danas?"gold":"")+'" onclick="openKpi(\'danas\')"><div class="big">'+danas+'</div><div class="lab">Za danas</div></div>'+
+    '<div class="kpi '+(kasni?"warn":"")+'" onclick="openKpi(\'kasni\')"><div class="big">'+kasni+'</div><div class="lab">Kasni</div></div>'+
+    '<div class="kpi" onclick="openKpi(\'spremno\')"><div class="big">'+spremno+'</div><div class="lab">Spremno za preuzimanje</div></div>'+
+    '<div class="kpi" onclick="openKpi(\'sutra\')"><div class="big">'+sutra+'</div><div class="lab">Za sutra</div></div>'+
   '</div>';
 }
 
@@ -316,7 +346,7 @@ function renderLista(){
     return okQ&&okF;
   });
   h+='<table class="tbl"><thead><tr><th>Narudžba</th><th>Kupac</th><th>Torta</th><th>Kanal</th><th>Rok</th><th>Faza</th><th>Majstor</th></tr></thead><tbody>';
-  h+=rows.map(n=>'<tr onclick="openNar(\''+n.id+'\')"><td><b>'+n.id+'</b></td><td>'+n.kupac+'</td><td>'+n.torta+' <span class="hint">'+n.kg+' kg</span></td><td>'+chanTag(n)+'</td><td>'+rokPill(n)+'</td><td>'+fazaTag(n)+'</td><td>'+whoTag(n)+'</td></tr>').join("");
+  h+=rows.map(n=>'<tr onclick="openNar(\''+n.id+'\')"><td data-label="Narudžba"><b>'+n.id+'</b></td><td data-label="Kupac">'+n.kupac+'</td><td data-label="Torta">'+n.torta+' <span class="hint">'+n.kg+' kg</span></td><td data-label="Kanal">'+chanTag(n)+'</td><td data-label="Rok">'+rokPill(n)+'</td><td data-label="Faza">'+fazaTag(n)+'</td><td data-label="Majstor">'+whoTag(n)+'</td></tr>').join("");
   h+='</tbody></table>';
   if(!rows.length) h+='<div class="hint" style="padding:14px">Nema narudžbi za zadati filter.</div>';
   el("view").innerHTML=h;
@@ -326,17 +356,18 @@ function renderPregled(){
   let h=kpiRow();
   const aktivni=NAR.filter(n=>!isDone(n));
   const vrijednost=aktivni.reduce((s,n)=>s+n.cijena,0);
+  h+='<div class="viewhead"><h3>Pregled</h3><span class="sub">Kliknite na KPI karticu gore ili na bilo koju traku ispod da dobijete spisak tih narudžbi.</span></div>';
   h+='<div class="grid2">';
   h+='<div class="panel"><h3>Narudžbe po fazi</h3>';
   const maxF=Math.max(1,...FAZE.map((_,i)=>NAR.filter(n=>n.faza===i).length));
   FAZE.forEach((f,i)=>{ const c=NAR.filter(n=>n.faza===i).length;
-    h+='<div class="bar"><div class="blab">'+f+'</div><div class="track"><div class="fill" style="width:'+(c/maxF*100)+'%"></div></div><div class="val">'+c+' narudžbi</div></div>';
+    h+='<div class="bar clk" onclick="openFaza('+i+')"><div class="blab">'+f+'</div><div class="track"><div class="fill" style="width:'+(c/maxF*100)+'%"></div></div><div class="val">'+c+' narudžbi ›</div></div>';
   });
   h+='</div>';
   h+='<div class="panel"><h3>Opterećenje po majstoru (aktivno)</h3>';
   const maxO=Math.max(1,...OSOBLJE.map((_,i)=>aktivni.filter(n=>n.ko===i).length));
   OSOBLJE.forEach((o,i)=>{ const c=aktivni.filter(n=>n.ko===i).length;
-    h+='<div class="bar"><div class="blab"><span class="who" style="background:'+o.boja+'">'+o.n+'</span></div><div class="track"><div class="fill" style="width:'+(c/maxO*100)+'%;background:'+o.boja+'"></div></div><div class="val">'+c+' aktivnih</div></div>';
+    h+='<div class="bar clk" onclick="openMajstor('+i+')"><div class="blab"><span class="who" style="background:'+o.boja+'">'+o.n+'</span></div><div class="track"><div class="fill" style="width:'+(c/maxO*100)+'%;background:'+o.boja+'"></div></div><div class="val">'+c+' aktivnih ›</div></div>';
   });
   h+='</div>';
   h+='</div>';
@@ -377,6 +408,28 @@ function openNar(id){
   el("overlay").classList.add("open");
 }
 function closeModal(){ el("overlay").classList.remove("open"); }
+
+// ---- Spisak narudžbi (iz Pregleda / KPI kartica) --------------------------
+const byTime=(a,b)=>a.vrijeme<b.vrijeme?-1:1;
+function openList(title, arr){
+  let h='<div class="mhead"><div><h2>'+title+'</h2><div class="msub">'+arr.length+' narudžbi</div></div><div class="x" onclick="closeModal()">×</div></div>';
+  h+='<div class="mbody" style="padding:12px 14px">';
+  h+= arr.length ? arr.map(orow).join("") : '<div class="hint" style="padding:14px">Nema narudžbi.</div>';
+  h+='</div>';
+  el("modal").innerHTML=h; el("overlay").classList.add("open");
+}
+function openKpi(which){
+  let arr=[], title="";
+  if(which==="aktivni"){ arr=NAR.filter(n=>!isDone(n)); title="Aktivne narudžbe"; }
+  else if(which==="danas"){ arr=NAR.filter(isToday).sort(byTime); title="Za danas"; }
+  else if(which==="kasni"){ arr=NAR.filter(isLate).sort(byTime); title="Narudžbe koje kasne"; }
+  else if(which==="spremno"){ arr=NAR.filter(n=>n.faza===3); title="Spremno za preuzimanje"; }
+  else if(which==="sutra"){ arr=NAR.filter(n=>!isDone(n)&&n.offset===1).sort(byTime); title="Za sutra"; }
+  openList(title, arr);
+}
+function openFaza(i){ openList("Faza: "+FAZE[i], NAR.filter(n=>n.faza===i)); }
+function openMajstor(i){ openList("Majstor: "+OSOBLJE[i].n+" (aktivno)", NAR.filter(n=>!isDone(n)&&n.ko===i)); }
+
 function advance(id){
   const n=NAR.find(x=>x.id===id); if(!n||isDone(n))return;
   n.faza++;
