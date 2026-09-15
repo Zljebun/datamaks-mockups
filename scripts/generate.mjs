@@ -85,21 +85,16 @@ async function main() {
   const link = `${DEMO_BASE}/m/${ID}/`;
   await supabaseUpdateLead(ID, { status: "live" });
 
-  // Mail se NE šalje kupcu automatski. Ide PRVO na info@datamaks.net na ODOBRENJE
-  // (isti mail koji bi išao kupcu + interni okvir). Milan pregleda i sam prosljeđuje.
+  // Mail se NE šalje kupcu automatski. Na info@ ide ČIST mail (tačno kako ide kupcu,
+  // bez internih dodataka) na pregled; svi detalji o kupcu su u ntfy. Milan samo proslijedi.
   let mailOk = true;
   try {
-    await sendLinkEmail({
-      to: process.env.REVIEW_TO || "info@datamaks.net",
-      link,
-      subject: `Za odobrenje: prototip za ${EMAIL || "(bez emaila)"}`,
-      review: { email: EMAIL, telefon: TELEFON, tip: TIP, opis: OPIS },
-    });
+    await sendLinkEmail({ to: process.env.REVIEW_TO || "info@datamaks.net", link });
   } catch (e) { mailOk = false; console.error("Mail za odobrenje nije poslan:", e.message); }
 
   await notifyGen(
     (mailOk ? "Prototip i mail SPREMNI za ODOBRENJE." : "Prototip gotov ALI mail za odobrenje NIJE poslan.") +
-    `\nKupac: ${EMAIL || "-"}${TELEFON ? " · " + TELEFON : ""}\nProvjeri info@datamaks.net pa proslijedi kupcu ako je ok.\n${link}`,
+    `\nKupac: ${EMAIL || "-"}${TELEFON ? " · " + TELEFON : ""}\nDjelatnost: ${TIP || "-"}\nOpis: ${OPIS.slice(0, 220)}\nMail je u info@datamaks.net (čist, samo proslijedi kupcu).\n${link}`,
     { title: mailOk ? "Za odobrenje" : "Mail pao", priority: "high", tags: mailOk ? "email" : "warning" });
 
   console.log("OK (za odobrenje):", link);
