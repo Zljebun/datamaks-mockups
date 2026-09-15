@@ -63,7 +63,7 @@ export async function sendLinkEmail({ to, link, subject = "Vaš prototip je spre
     text:
       boxText +
       `Zdravo,\n\nVaš demo prototip je spreman:\n${link}\n\n` +
-      `Link je aktivan 24 sata. Prototip radi na izmišljenim primjerima, ` +
+      `Link je aktivan 7 dana. Prototip radi na izmišljenim primjerima, ` +
       `da vidite kako bi izgledalo rješenje za vašu firmu.\n\n` +
       `Za punu verziju javite se na datamaks.net.\n\nDatamaks · Vaš posao. Vaš softver.`,
     html:
@@ -89,7 +89,7 @@ export async function sendLinkEmail({ to, link, subject = "Vaš prototip je spre
             <tr><td style="padding:28px 34px 0">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border:1px solid #eef2f6;border-radius:12px">
                 <tr><td style="padding:16px 18px;font-size:14px;color:#475569;line-height:1.9">
-                  &#9203;&nbsp; Link je aktivan <b style="color:#0f172a">24 sata</b><br>
+                  &#9203;&nbsp; Link je aktivan <b style="color:#0f172a">7 dana</b><br>
                   &#128274;&nbsp; Napredne funkcije su zaključane u demou<br>
                   &#10022;&nbsp; Primjeri su izmišljeni, radi prikaza
                 </td></tr>

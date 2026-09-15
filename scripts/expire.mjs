@@ -7,7 +7,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { ROOT, loadMockups, saveMockups, supabaseUpdateLead, supabaseKeepAlive } from "./lib.mjs";
 
-const TTL_MS = 24 * 60 * 60 * 1000;
+const TTL_MS = 7 * 24 * 60 * 60 * 1000;   // 7 dana (bilo 24h; produženo zbog ručnog odobrenja maila)
 const STUB = readFileSync(join(ROOT, "_stub-expired.html"), "utf8");
 
 async function main() {
