@@ -10,7 +10,8 @@ export const DEMO_BASE = "https://demo.datamaks.net";
 
 // ntfy: javi na Milanov telefon SVAKI dogadjaj generatora (zahtjev + svaki ishod).
 // Naslov/tagovi moraju biti ASCII (ntfy headeri), poruka (body) moze biti UTF-8.
-export const NTFY_GEN_TOPIC = process.env.NTFY_GEN_TOPIC || "datamaks-generator-7q2m";
+// Topic na koji je Milanov telefon VEĆ pretplaćen (isti kao za posjete) → zajamčena isporuka.
+export const NTFY_GEN_TOPIC = process.env.NTFY_GEN_TOPIC || "datamaks-posjete-7g3x";
 export async function notifyGen(body, { title = "Generator", priority = "default", tags = "" } = {}) {
   try {
     const headers = { Title: title, Priority: priority };

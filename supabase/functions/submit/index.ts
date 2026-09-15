@@ -21,7 +21,7 @@ function newId(): string {
 
 // ntfy: javi na Milanov telefon SVAKI zahtjev sa forme (i odbijen i prihvaćen).
 // Naslov/tagovi = ASCII (ntfy headeri), poruka (body) = UTF-8.
-const NTFY_TOPIC = Deno.env.get("NTFY_GEN_TOPIC") || "datamaks-generator-7q2m";
+const NTFY_TOPIC = Deno.env.get("NTFY_GEN_TOPIC") || "datamaks-posjete-7g3x";
 async function ntfy(body: string, title: string, priority = "default", tags = "") {
   try {
     const headers: Record<string, string> = { Title: title, Priority: priority };
