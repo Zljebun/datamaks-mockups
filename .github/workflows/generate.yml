@@ -37,6 +37,7 @@ jobs:
           OPIS: ${{ github.event.client_payload.opis }}
           TIP: ${{ github.event.client_payload.tip }}
           EMAIL: ${{ github.event.client_payload.email }}
+          TELEFON: ${{ github.event.client_payload.telefon }}
         run: node scripts/generate.mjs
 
       - name: Commit i push

@@ -16,6 +16,7 @@ const ID = process.env.MOCKUP_ID;
 const OPIS = (process.env.OPIS || "").trim();
 const TIP = (process.env.TIP || "").trim();
 const EMAIL = (process.env.EMAIL || "").trim();
+const TELEFON = (process.env.TELEFON || "").trim();
 
 async function moderate(opis) {
   // FAIL-OPEN: odbij SAMO ako model eksplicitno kaže "NE". Sve ostalo (uključujući
@@ -82,18 +83,26 @@ async function main() {
   saveMockups(list);
 
   const link = `${DEMO_BASE}/m/${ID}/`;
-  let mailOk = true;
-  if (EMAIL) {
-    try { await sendLinkEmail({ to: EMAIL, link }); }
-    catch (e) { mailOk = false; console.error("Email nije poslan:", e.message); }
-  }
   await supabaseUpdateLead(ID, { status: "live" });
 
-  await notifyGen(
-    `Prototip napravljen${EMAIL ? (mailOk ? " i link poslat" : " ALI EMAIL NIJE POSLAT") : ""}.\nEmail: ${EMAIL || "-"}\n${link}`,
-    { title: mailOk ? "Prototip gotov" : "Gotov, mail pao", priority: mailOk ? "default" : "high", tags: mailOk ? "white_check_mark" : "warning" });
+  // Mail se NE šalje kupcu automatski. Ide PRVO na info@datamaks.net na ODOBRENJE
+  // (isti mail koji bi išao kupcu + interni okvir). Milan pregleda i sam prosljeđuje.
+  let mailOk = true;
+  try {
+    await sendLinkEmail({
+      to: process.env.REVIEW_TO || "info@datamaks.net",
+      link,
+      subject: `Za odobrenje: prototip za ${EMAIL || "(bez emaila)"}`,
+      review: { email: EMAIL, telefon: TELEFON, tip: TIP, opis: OPIS },
+    });
+  } catch (e) { mailOk = false; console.error("Mail za odobrenje nije poslan:", e.message); }
 
-  console.log("OK:", link);
+  await notifyGen(
+    (mailOk ? "Prototip i mail SPREMNI za ODOBRENJE." : "Prototip gotov ALI mail za odobrenje NIJE poslan.") +
+    `\nKupac: ${EMAIL || "-"}${TELEFON ? " · " + TELEFON : ""}\nProvjeri info@datamaks.net pa proslijedi kupcu ako je ok.\n${link}`,
+    { title: mailOk ? "Za odobrenje" : "Mail pao", priority: "high", tags: mailOk ? "email" : "warning" });
+
+  console.log("OK (za odobrenje):", link);
 }
 
 main().catch(async (e) => {

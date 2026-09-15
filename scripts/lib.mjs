@@ -39,18 +39,35 @@ export function smtp() {
   });
 }
 
-export async function sendLinkEmail({ to, link }) {
+export async function sendLinkEmail({ to, link, subject = "Vaš prototip je spreman", review = null }) {
   const t = smtp();
+  const esc = (s) => String(s || "").replace(/[<>&]/g, (x) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[x]));
+  // Kada je `review` prosljeđen, mail ide na info@ na ODOBRENJE: dodaje se narančasti
+  // interni okvir (kupac + opis + link) iznad maila koji bi išao kupcu.
+  const boxHtml = review
+    ? `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto 14px;padding:14px 16px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;color:#7c2d12;font-size:14px;line-height:1.6">
+        <b>ZA ODOBRENJE (interno, NE ide kupcu)</b><br>
+        Kupac: <b>${esc(review.email)}</b>${review.telefon ? " &middot; tel: " + esc(review.telefon) : ""}${review.tip ? " &middot; " + esc(review.tip) : ""}<br>
+        Opis: ${esc(review.opis)}<br>
+        Prototip: <a href="${link}">${link}</a><br>
+        <span style="color:#9a3412">Provjeri prototip. Ako je u redu, proslijedi mail ispod kupcu na ${esc(review.email)}. Ovaj narančasti okvir obriši prije slanja.</span>
+      </div>`
+    : "";
+  const boxText = review
+    ? `ZA ODOBRENJE (interno, NE ide kupcu)\nKupac: ${review.email}${review.telefon ? " · tel: " + review.telefon : ""}${review.tip ? " · " + review.tip : ""}\nOpis: ${review.opis}\nPrototip: ${link}\nAko je ok, proslijedi mail ispod kupcu na ${review.email}.\n------------------------------------------------------------\n\n`
+    : "";
   await t.sendMail({
     from: '"Datamaks" <info@datamaks.net>',
     to,
-    subject: "Vaš prototip je spreman",
+    subject,
     text:
+      boxText +
       `Zdravo,\n\nVaš demo prototip je spreman:\n${link}\n\n` +
       `Link je aktivan 24 sata. Prototip radi na izmišljenim primjerima, ` +
       `da vidite kako bi izgledalo rješenje za vašu firmu.\n\n` +
       `Za punu verziju javite se na datamaks.net.\n\nDatamaks · Vaš posao. Vaš softver.`,
     html:
+      boxHtml +
       `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">Vaš klikabilni prototip je spreman. Pogledajte kako izgleda rješenje za vašu firmu.</div>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;margin:0;padding:24px 12px;font-family:Arial,Helvetica,sans-serif">
         <tr><td align="center">
