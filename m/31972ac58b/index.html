@@ -156,6 +156,11 @@
     .tbl tbody td::before{content:attr(data-label);color:var(--muted);font-size:12px;font-weight:600;text-align:left;flex:0 0 auto}
     .tbl tbody td:not(:last-child){border-bottom:1px solid var(--track)}
     .filterbar input{flex:1 1 100%}
+    /* Za danas: da pill natpisi ne idu preko imena — ime se skraćuje, pills u novi red ispod */
+    .orow{flex-wrap:wrap;row-gap:7px}
+    .orow .main{flex:1 1 0;min-width:0}
+    .orow .cust{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .orow .rgt{flex:1 1 100%;justify-content:flex-start;padding-left:64px}
   }
   /* Telefon: detaljan pregled narudžbe */
   @media(max-width:560px){
