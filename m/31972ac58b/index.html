@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slastičarna · digitalna sveska narudžbi (demo)</title>
+<meta name="description" content="Klikabilni demo prototip za slastičarnu: sve narudžbe torti na jednom mjestu, sa rokom preuzimanja, statusom i zaduženim majstorom. Nikad zaboravljen rok, nikad zamijenjena narudžba. Izmišljeni podaci, stvarna logika.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://demo.datamaks.net/m/31972ac58b/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%23b03a5b'/%3E%3Ctext%20x='32'%20y='45'%20font-size='34'%20text-anchor='middle'%3E%F0%9F%8E%82%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --brand:#b03a5b; --brand2:#d16b8a; --accent:#c8912f; --action:#b03a5b;
+    --bg:#fdf6f4; --card:#fff; --line:#f0dfe2; --muted:#7d6a6e; --text:#2a1a1e;
+    --ok:#3f7d4e; --warn:#b45309; --late:#c02626; --track:#f4e7ea;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  header{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:11px 20px;display:flex;align-items:center;gap:13px}
+  .monogram{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-size:20px}
+  .brand .name{font-weight:800;font-size:16px;line-height:1}
+  .brand .tag{font-size:11.5px;color:#ffe3ec;letter-spacing:.2px;margin-top:3px}
+  header .spacer{flex:1}
+  .user{display:flex;align-items:center;gap:8px;font-size:13px}
+  .avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;background:var(--accent)}
+  .toolbar{display:flex;align-items:center;gap:6px;padding:0 20px;border-bottom:1px solid var(--line);background:#fff;flex-wrap:wrap}
+  .tab{padding:14px 12px 12px;font-size:15px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer}
+  .tab.active{color:var(--brand);border-bottom-color:var(--brand)}
+  .demo-flag{margin-left:10px;background:#fde7ee;color:var(--brand);border:1px solid #f6c9d6;padding:4px 10px;border-radius:6px;font-size:12px;align-self:center}
+  .newbtn{margin-left:auto;background:var(--action);color:#fff;border:0;padding:8px 14px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;align-self:center}
+  .newbtn:hover{filter:brightness(1.07)}
+  .wrap{padding:16px 20px;max-width:1200px;margin:0 auto}
+  .viberCta{margin:12px 20px;padding:14px 16px;border-radius:14px;background:#fff0f4;border:1px solid #f6c9d6;max-width:1200px}
+  .viberCta .t{font-size:13.5px;line-height:1.55;color:#2a1a1e;margin-bottom:10px}
+  .viberCta .btns{display:flex;gap:10px;flex-wrap:wrap}
+  .viberCta a{padding:11px 18px;border-radius:999px;font-weight:700;font-size:14px;text-decoration:none;color:#fff}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;transition:.12s}
+  .kpi:hover{border-color:var(--brand2);box-shadow:0 3px 12px rgba(176,58,91,.12);transform:translateY(-1px)}
+  .kpi .big{font-size:24px;font-weight:800;color:var(--brand)}
+  .kpi .lab{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .kpi.warn .big{color:var(--late)}
+  .kpi.gold .big{color:var(--accent)}
+
+  .viewhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .viewhead h3{margin:0;font-size:16px;color:var(--brand)}
+  .viewhead .sub{font-size:13px;color:var(--muted)}
+  .filterbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .filterbar input,.filterbar select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;background:#fff;color:var(--text)}
+  .filterbar input{flex:0 1 260px}
+
+  .daygroup{margin-bottom:18px}
+  .daygroup h4{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  .daygroup h4 .cnt{color:var(--brand);font-weight:800}
+  .orow{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:12px;padding:11px 14px;margin-bottom:9px;cursor:pointer;transition:.1s}
+  .orow:hover{box-shadow:0 4px 14px rgba(120,40,60,.12);transform:translateY(-1px)}
+  .orow.late{border-left-color:var(--late);background:#fff6f6}
+  .orow.today{border-left-color:var(--accent)}
+  .orow .time{font-weight:800;font-size:15px;min-width:52px;font-variant-numeric:tabular-nums}
+  .orow .main{flex:1;min-width:0}
+  .orow .cust{font-weight:700;font-size:14.5px}
+  .orow .cake{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .orow .rgt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
+  .board{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px}
+  .col{flex:0 0 244px;background:#fff8f5;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column}
+  .col.done{background:#f2f8f3;border-color:#cfe6d4}
+  .col-h{padding:10px 12px;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+  .col.done .col-h{color:var(--ok)}
+  .wip{background:#fff;border:1px solid var(--line);border-radius:20px;padding:1px 9px;font-size:12px;color:var(--muted);font-weight:700}
+  .col-body{padding:10px;display:flex;flex-direction:column;gap:9px;min-height:60px}
+  .card{background:#fff;border:1px solid var(--line);border-left:4px solid var(--muted);border-radius:11px;padding:10px 11px;cursor:pointer;box-shadow:0 1px 2px rgba(120,40,60,.06);transition:.1s}
+  .card:hover{box-shadow:0 4px 12px rgba(120,40,60,.15);transform:translateY(-1px)}
+  .card.late{border-left-color:var(--late);background:#fff6f6}
+  .card.today{border-left-color:var(--accent)}
+  .card .cid{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .card .cc{font-weight:700;font-size:13.5px;margin:2px 0 1px}
+  .card .ck{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card .crow{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:8px}
+  .card .adv{border:0;background:var(--brand);color:#fff;border-radius:6px;min-width:28px;height:25px;cursor:pointer;font-size:14px;font-weight:700}
+  .card .adv:hover{filter:brightness(1.1)}
+
+  .pill{padding:2px 9px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+  .p-late{background:#fde2e2;color:var(--late)}
+  .p-today{background:#fdefda;color:#9a6413}
+  .p-soon{background:#f3e8ec;color:var(--brand)}
+  .p-done{background:#dff0e3;color:var(--ok)}
+  .p-faza{background:#f6e3ea;color:var(--brand)}
+  .chan{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:20px}
+  .chan.viber{background:#efeaff;color:#5b3fd1}
+  .chan.telefon{background:#e5f0ff;color:#1f5fbf}
+  .who{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff}
+
+  .tbl{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14px}
+  .tbl thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);padding:11px 14px;background:var(--track);border-bottom:1px solid var(--line)}
+  .tbl td{padding:11px 14px;border-bottom:1px solid var(--line)}
+  .tbl tbody tr{cursor:pointer}
+  .tbl tbody tr:hover{background:var(--track)}
+  .tbl tbody tr:last-child td{border-bottom:0}
+
+  .bar{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:14px}
+  .bar .blab{width:120px;display:flex;align-items:center;gap:7px}
+  .bar .track{flex:1;background:var(--track);border-radius:6px;height:18px;overflow:hidden}
+  .bar .fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--brand2),var(--brand))}
+  .bar .val{width:120px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+  .panel h3{margin:0 0 12px;font-size:12px;text-transform:uppercase;letter-spacing:.3px;color:var(--brand)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:820px){.grid2{grid-template-columns:1fr}}
+
+  .overlay{position:fixed;inset:0;background:rgba(60,20,30,.5);display:none;align-items:flex-start;justify-content:center;padding:28px 16px;overflow:auto;z-index:50}
+  .overlay.open{display:flex}
+  .modal{background:#fff;border-radius:16px;max-width:620px;width:100%;box-shadow:0 20px 60px rgba(60,20,30,.35);overflow:hidden}
+  .mhead{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:16px 20px;display:flex;align-items:flex-start;gap:12px}
+  .mhead h2{margin:0;font-size:19px}
+  .mhead .msub{font-size:12.5px;color:#ffe3ec;margin-top:3px}
+  .mhead .x{margin-left:auto;cursor:pointer;font-size:22px;opacity:.9}
+  .mbody{padding:18px 20px}
+  .latebanner{background:#fde2e2;border:1px solid #f6c2c2;color:#8f1d1d;border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:12px;font-weight:600}
+  .kv{display:flex;font-size:14.5px;padding:5px 0;border-bottom:1px dashed #f0e0e4}
+  .kv .k{width:130px;color:var(--muted)}
+  .kv .v{flex:1}
+  .sec-title{font-size:12px;text-transform:uppercase;letter-spacing:.3px;color:var(--brand);font-weight:700;margin:16px 0 8px}
+  .natpis{background:#fff8f0;border:1px dashed var(--accent);border-radius:10px;padding:10px 12px;font-size:14px;color:#5a4318}
+  .stepper{display:flex;flex-wrap:wrap;gap:4px}
+  .step{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+  .step .dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:#fff}
+  .step.done .dot{background:var(--brand);border-color:var(--brand);color:#fff}
+  .step.cur .dot{border-color:var(--brand);color:var(--brand)}
+  .step.cur{color:var(--brand);font-weight:700}
+  .step .arr{color:var(--line)}
+  .actions{padding:14px 20px;background:#fff8f5;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  button.primary{background:var(--action);color:#fff;border:0;padding:10px 15px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}
+  button.primary:hover{filter:brightness(1.08)}
+  button.secondary{background:#fff;color:var(--brand);border:1px solid #eac6d1;padding:9px 13px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13.5px}
+  a.callbtn{text-decoration:none}
+  .hint{font-size:12.5px;color:var(--muted)}
+  .frow{margin-bottom:12px;display:flex;flex-direction:column;gap:4px}
+  .frow label{font-size:13px;color:var(--muted);font-weight:600}
+  .frow input,.frow select,.frow textarea{padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:var(--text)}
+  .frow input:focus,.frow select:focus,.frow textarea:focus{outline:none;border-color:var(--brand2)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:560px){.row2{grid-template-columns:1fr}}
+  footer{padding:16px 20px;color:var(--muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="monogram">🎂</div>
+  <div class="brand">
+    <div class="name">Slastičarna</div>
+    <div class="tag">Digitalna sveska narudžbi · torte i kolači po narudžbi</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="user"><span class="avatar">R</span><span>Rašida</span></div>
+</header>
+
+<div class="toolbar">
+  <div class="tab active" data-view="danas" onclick="setView('danas')">Za danas</div>
+  <div class="tab" data-view="tabla" onclick="setView('tabla')">Tabla</div>
+  <div class="tab" data-view="lista" onclick="setView('lista')">Sve narudžbe</div>
+  <div class="tab" data-view="pregled" onclick="setView('pregled')">Pregled</div>
+  <button class="newbtn" onclick="openNova()">+ Nova narudžba</button>
+  <span class="demo-flag">DEMO · izmišljeni podaci</span>
+</div>
+
+<div class="viberCta">
+  <div class="t"><b>Ovaj prototip je napravljen baš za vašu slastičarnu.</b> Na osnovu onoga što ste opisali, narudžbe za torte koje stižu preko Vibera i telefona, ovako bi izgledalo kad umjesto sveske sve stoji na jednom mjestu: svaka narudžba ima svoj rok preuzimanja, status i zaduženog majstora, pa ništa ne može biti zaboravljeno ni zamijenjeno. Sviđa vam se? Javite se pa da ga prilagodimo tačno vašem načinu rada.</div>
+  <div class="btns">
+    <a href="viber://add?number=38765469565" data-kanal="viber" style="background:#7360F2">Pišite na Viber</a>
+    <a href="https://wa.me/436677970082" target="_blank" rel="noopener" data-kanal="whatsapp" style="background:#25D366">WhatsApp</a>
+    <a href="tel:+38765469565" data-kanal="telefon" style="background:#2a1a1e">Pozovi</a>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.viberCta [data-kanal]').forEach(function(a){a.addEventListener('click',function(){var k=a.getAttribute('data-kanal');if(window.gtag)gtag('event','kontakt_klik',{kanal:k,stranica:'mockup-slasticarna'});});});
+</script>
+
+<div id="view" class="wrap"></div>
+<footer>Demo prototip · podaci su izmišljeni · © Datamaks</footer>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+// ---- Model ----------------------------------------------------------------
+const FAZE = ["Primljeno","Priprema","Dekoracija","Spremno","Preuzeto"];
+const LAST = 4; // indeks "Preuzeto"
+const OSOBLJE = [
+  {n:"Rašida", boja:"#b03a5b"},
+  {n:"Amina",  boja:"#c8912f"},
+  {n:"Lejla",  boja:"#6b7f4b"},
+];
+
+// rok: offset dana od danas + vrijeme; faza 0..4; kanal viber/telefon; ko = indeks osoblja
+let NAR = [
+  {id:"SL-2048", kupac:"Amela Kovač",    tel:"065 111 222", kanal:"viber",   torta:"Rođendanska torta (jednorog)", kg:3,   ukus:"čokolada i malina",  dekor:"roze fondan, figura jednoroga", natpis:"Sretan 5. rođendan, Sara", alergije:"nema", cijena:95,  offset:0,  vrijeme:"16:00", faza:3, ko:0, nap:"Kupac dolazi po tortu poslije 16h."},
+  {id:"SL-2047", kupac:"Nedžad Hodžić",  tel:"061 333 444", kanal:"telefon", torta:"Torta za rođendan (fudbal)",   kg:4,   ukus:"vanila i banana",    dekor:"zeleni fondan, teren i lopta",  natpis:"Sretan rođendan, Emir",    alergije:"nema", cijena:110, offset:0,  vrijeme:"18:00", faza:2, ko:1, nap:""},
+  {id:"SL-2046", kupac:"Merima Hadžić",  tel:"063 555 666", kanal:"viber",   torta:"Torta (djevojačko veče)",      kg:3,   ukus:"red velvet",         dekor:"roze i zlatno, natpis na vrhu", natpis:"Team bride", alergije:"nema", cijena:105, offset:0,  vrijeme:"20:00", faza:3, ko:1, nap:""},
+  {id:"SL-2045", kupac:"Jasmina Ramić",  tel:"062 777 888", kanal:"viber",   torta:"Torta za krštenje",            kg:3.5, ukus:"čokolada i lješnik", dekor:"svijetloplava dekoracija",      natpis:"Dobrodošao, Tarik",        alergije:"nema", cijena:100, offset:0,  vrijeme:"19:00", faza:1, ko:2, nap:"Rizično: rok danas, još u pripremi."},
+  {id:"SL-2044", kupac:"Kemal Đelilović",tel:"065 999 000", kanal:"telefon", torta:"Rođendanska torta",            kg:2,   ukus:"vanila i jagoda",    dekor:"bijeli fondan, cvjetići",       natpis:"Sretan rođendan",          alergije:"laktoza", cijena:70, offset:-1, vrijeme:"15:00", faza:3, ko:0, nap:"Spremno, kupac još nije došao po preuzimanje."},
+  {id:"SL-2043", kupac:"Selma Begić",    tel:"061 121 314", kanal:"viber",   torta:"Rođendanska torta (cvijeće)",  kg:2.5, ukus:"red velvet",         dekor:"pastelne ruže od kreme",        natpis:"Sve najbolje",             alergije:"orašasti plodovi", cijena:85, offset:1, vrijeme:"12:00", faza:1, ko:2, nap:""},
+  {id:"SL-2042", kupac:"Damir Alić",     tel:"063 151 617", kanal:"telefon", torta:"Dječija torta (Bagi)",         kg:3,   ukus:"čokolada i oreo",    dekor:"plavi fondan, lik Bagija",      natpis:"Sretan 3. rođendan",       alergije:"nema", cijena:90,  offset:1,  vrijeme:"17:00", faza:0, ko:0, nap:""},
+  {id:"SL-2041", kupac:"Amra Suljić",    tel:"065 181 920", kanal:"viber",   torta:"Torta za 18. rođendan",        kg:5,   ukus:"čokolada",           dekor:"zlatni detalji, broj 18",       natpis:"Sretan 18. rođendan",      alergije:"nema", cijena:140, offset:2,  vrijeme:"15:00", faza:0, ko:1, nap:""},
+  {id:"SL-2040", kupac:"Vedad Mujić",    tel:"062 212 223", kanal:"telefon", torta:"Rođendanska torta (auto)",     kg:3,   ukus:"vanila",             dekor:"crveni auto od fondana",        natpis:"Sretan 4. rođendan",       alergije:"nema", cijena:92,  offset:3,  vrijeme:"16:00", faza:0, ko:0, nap:""},
+  {id:"SL-2039", kupac:"Lejla Softić",   tel:"061 242 526", kanal:"viber",   torta:"Naked torta (godišnjica)",     kg:4,   ukus:"vanila i šumsko voće",dekor:"svježe voće, bez fondana",      natpis:"Sretna godišnjica",        alergije:"nema", cijena:120, offset:3,  vrijeme:"18:00", faza:0, ko:1, nap:""},
+  {id:"SL-2038", kupac:"Adnan Bešić",    tel:"063 272 829", kanal:"telefon", torta:"Rođendanska torta",            kg:2,   ukus:"čokolada",           dekor:"smeđi fondan, jednostavno",     natpis:"Sretan rođendan, tata",    alergije:"nema", cijena:68,  offset:-1, vrijeme:"14:00", faza:4, ko:0, nap:"Preuzeto na vrijeme."},
+];
+
+// ---- Helperi --------------------------------------------------------------
+const el=id=>document.getElementById(id);
+const m2=n=>String(n).padStart(2,"0");
+let VIEW="danas";
+const isDone=n=>n.faza>=LAST;
+const isLate=n=>!isDone(n)&&n.offset<0;
+const isToday=n=>!isDone(n)&&n.offset===0;
+const money=v=>Math.round(v).toLocaleString("de-DE")+" KM";
+function dateStr(off){ const d=new Date(); d.setDate(d.getDate()+off); return d.getDate()+"."+m2(d.getMonth()+1)+"."; }
+function dayName(off){ const dani=["nedjelja","ponedjeljak","utorak","srijeda","četvrtak","petak","subota"]; const d=new Date(); d.setDate(d.getDate()+off); return dani[d.getDay()]; }
+function rokPill(n){
+  if(isDone(n)) return '<span class="pill p-done">✓ preuzeto</span>';
+  if(n.offset<0) return '<span class="pill p-late">kasni '+(-n.offset)+" d</span>";
+  if(n.offset===0) return '<span class="pill p-today">danas '+n.vrijeme+"</span>";
+  if(n.offset===1) return '<span class="pill p-soon">sutra '+n.vrijeme+"</span>";
+  return '<span class="pill p-soon">za '+n.offset+" d</span>";
+}
+function fazaTag(n){ return isDone(n)?'<span class="pill p-done">'+FAZE[LAST]+"</span>":'<span class="pill p-faza">'+FAZE[n.faza]+"</span>"; }
+const chanTag=n=>'<span class="chan '+n.kanal+'">'+(n.kanal==="viber"?"Viber":"Telefon")+"</span>";
+function whoTag(n){ const o=OSOBLJE[n.ko]; return '<span class="who" style="background:'+o.boja+'">'+o.n+"</span>"; }
+const rowCls=n=> isLate(n)?"late":(isToday(n)?"today":"");
+
+// ---- Render ---------------------------------------------------------------
+function setView(v){
+  VIEW=v;
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===v));
+  render();
+}
+function render(){
+  if(VIEW==="danas") return renderDanas();
+  if(VIEW==="tabla") return renderTabla();
+  if(VIEW==="lista") return renderLista();
+  if(VIEW==="pregled") return renderPregled();
+}
+
+function kpiRow(){
+  const aktivni=NAR.filter(n=>!isDone(n)).length;
+  const danas=NAR.filter(isToday).length;
+  const kasni=NAR.filter(isLate).length;
+  const spremno=NAR.filter(n=>n.faza===3).length;
+  const sutra=NAR.filter(n=>!isDone(n)&&n.offset===1).length;
+  return '<div class="kpis">'+
+    '<div class="kpi" onclick="setView(\'tabla\')"><div class="big">'+aktivni+'</div><div class="lab">Aktivne narudžbe</div></div>'+
+    '<div class="kpi '+(danas?"gold":"")+'" onclick="setView(\'danas\')"><div class="big">'+danas+'</div><div class="lab">Za danas</div></div>'+
+    '<div class="kpi '+(kasni?"warn":"")+'" onclick="setView(\'danas\')"><div class="big">'+kasni+'</div><div class="lab">Kasni</div></div>'+
+    '<div class="kpi" onclick="setView(\'tabla\')"><div class="big">'+spremno+'</div><div class="lab">Spremno za preuzimanje</div></div>'+
+    '<div class="kpi" onclick="setView(\'danas\')"><div class="big">'+sutra+'</div><div class="lab">Za sutra</div></div>'+
+  '</div>';
+}
+
+function orow(n){
+  return '<div class="orow '+rowCls(n)+'" onclick="openNar(\''+n.id+'\')">'+
+    '<div class="time">'+(isDone(n)?"✓":n.vrijeme)+'</div>'+
+    '<div class="main"><div class="cust">'+n.kupac+'</div><div class="cake">'+n.torta+' · '+n.kg+' kg · '+n.ukus+'</div></div>'+
+    '<div class="rgt">'+chanTag(n)+fazaTag(n)+whoTag(n)+'</div>'+
+  '</div>';
+}
+
+function renderDanas(){
+  const kasni=NAR.filter(isLate).sort((a,b)=>a.vrijeme<b.vrijeme?-1:1);
+  const danas=NAR.filter(isToday).sort((a,b)=>a.vrijeme<b.vrijeme?-1:1);
+  const sutra=NAR.filter(n=>!isDone(n)&&n.offset===1).sort((a,b)=>a.vrijeme<b.vrijeme?-1:1);
+  let h=kpiRow();
+  h+='<div class="viewhead"><h3>Za danas ('+dayName(0)+", "+dateStr(0)+')</h3><span class="sub">Sve što treba biti gotovo, po vremenu preuzimanja. Ovdje se vidi šta gori, da nijedan kupac ne ostane bez torte na vrijeme.</span></div>';
+  if(kasni.length){
+    h+='<div class="daygroup"><h4 style="color:var(--late)">⚠ Kasni <span class="cnt">'+kasni.length+'</span></h4>'+kasni.map(orow).join("")+"</div>";
+  }
+  h+='<div class="daygroup"><h4>Danas <span class="cnt">'+danas.length+'</span></h4>'+(danas.length?danas.map(orow).join(""):'<div class="hint">Nema narudžbi za danas.</div>')+"</div>";
+  h+='<div class="daygroup"><h4>Sutra ('+dateStr(1)+') <span class="cnt">'+sutra.length+'</span></h4>'+(sutra.length?sutra.map(orow).join(""):'<div class="hint">Nema narudžbi za sutra.</div>')+"</div>";
+  el("view").innerHTML=h;
+}
+
+function renderTabla(){
+  let h=kpiRow();
+  h+='<div class="viewhead"><h3>Tabla narudžbi</h3><span class="sub">Svaka narudžba putuje kroz faze. „›“ je pomjeri u sljedeću fazu, klik na karticu otvara detalje.</span></div>';
+  h+='<div class="board">';
+  for(let f=0; f<=LAST; f++){
+    const inCol=NAR.filter(n=>n.faza===f);
+    h+='<div class="col'+(f===LAST?" done":"")+'"><div class="col-h"><span>'+FAZE[f]+'</span><span class="wip">'+inCol.length+'</span></div><div class="col-body">';
+    h+=inCol.map(n=>{
+      const canAdv=f<LAST;
+      return '<div class="card '+rowCls(n)+'" onclick="openNar(\''+n.id+'\')">'+
+        '<div class="cid">'+n.id+'</div>'+
+        '<div class="cc">'+n.kupac+'</div>'+
+        '<div class="ck">'+n.torta+' · '+n.kg+' kg</div>'+
+        '<div class="crow">'+rokPill(n)+(canAdv?'<button class="adv" title="Sljedeća faza" onclick="event.stopPropagation();advance(\''+n.id+'\')">›</button>':whoTag(n))+'</div>'+
+      '</div>';
+    }).join("")||'<div class="hint" style="padding:6px">Prazno</div>';
+    h+='</div></div>';
+  }
+  h+='</div>';
+  el("view").innerHTML=h;
+}
+
+function renderLista(){
+  let h='<div class="viewhead"><h3>Sve narudžbe</h3><span class="sub">Poredano po roku preuzimanja.</span></div>';
+  h+='<div class="filterbar"><input id="q" placeholder="🔍 Pretraga (kupac, torta, ID)…" oninput="renderLista()"><select id="fst" onchange="renderLista()"><option value="">Sve faze</option>'+FAZE.map((f,i)=>'<option value="'+i+'">'+f+'</option>').join("")+'</select></div>';
+  const q=(el("q")?.value||"").toLowerCase();
+  const fst=el("fst")?.value;
+  let rows=NAR.slice().sort((a,b)=>{ if(isDone(a)!==isDone(b))return isDone(a)?1:-1; return a.offset-b.offset || (a.vrijeme<b.vrijeme?-1:1); });
+  rows=rows.filter(n=>{
+    const okQ=!q||(n.kupac+" "+n.torta+" "+n.id).toLowerCase().includes(q);
+    const okF=fst===""||fst==null||String(n.faza)===fst;
+    return okQ&&okF;
+  });
+  h+='<table class="tbl"><thead><tr><th>Narudžba</th><th>Kupac</th><th>Torta</th><th>Kanal</th><th>Rok</th><th>Faza</th><th>Majstor</th></tr></thead><tbody>';
+  h+=rows.map(n=>'<tr onclick="openNar(\''+n.id+'\')"><td><b>'+n.id+'</b></td><td>'+n.kupac+'</td><td>'+n.torta+' <span class="hint">'+n.kg+' kg</span></td><td>'+chanTag(n)+'</td><td>'+rokPill(n)+'</td><td>'+fazaTag(n)+'</td><td>'+whoTag(n)+'</td></tr>').join("");
+  h+='</tbody></table>';
+  if(!rows.length) h+='<div class="hint" style="padding:14px">Nema narudžbi za zadati filter.</div>';
+  el("view").innerHTML=h;
+}
+
+function renderPregled(){
+  let h=kpiRow();
+  const aktivni=NAR.filter(n=>!isDone(n));
+  const vrijednost=aktivni.reduce((s,n)=>s+n.cijena,0);
+  h+='<div class="grid2">';
+  h+='<div class="panel"><h3>Narudžbe po fazi</h3>';
+  const maxF=Math.max(1,...FAZE.map((_,i)=>NAR.filter(n=>n.faza===i).length));
+  FAZE.forEach((f,i)=>{ const c=NAR.filter(n=>n.faza===i).length;
+    h+='<div class="bar"><div class="blab">'+f+'</div><div class="track"><div class="fill" style="width:'+(c/maxF*100)+'%"></div></div><div class="val">'+c+' narudžbi</div></div>';
+  });
+  h+='</div>';
+  h+='<div class="panel"><h3>Opterećenje po majstoru (aktivno)</h3>';
+  const maxO=Math.max(1,...OSOBLJE.map((_,i)=>aktivni.filter(n=>n.ko===i).length));
+  OSOBLJE.forEach((o,i)=>{ const c=aktivni.filter(n=>n.ko===i).length;
+    h+='<div class="bar"><div class="blab"><span class="who" style="background:'+o.boja+'">'+o.n+'</span></div><div class="track"><div class="fill" style="width:'+(c/maxO*100)+'%;background:'+o.boja+'"></div></div><div class="val">'+c+' aktivnih</div></div>';
+  });
+  h+='</div>';
+  h+='</div>';
+  h+='<div class="panel"><h3>Ukratko</h3><div class="hint" style="font-size:14px;line-height:1.7;color:var(--text)">Aktivnih narudžbi: <b>'+aktivni.length+'</b>, ukupne vrijednosti <b>'+money(vrijednost)+'</b>. Za danas: <b>'+NAR.filter(isToday).length+'</b>, kasni: <b style="color:var(--late)">'+NAR.filter(isLate).length+'</b>. Sve narudžbe koje su nekad bile u svesci sada su na jednom mjestu, sa rokom, statusom i zaduženim majstorom.</div></div>';
+  el("view").innerHTML=h;
+}
+
+// ---- Modal detalj ---------------------------------------------------------
+function openNar(id){
+  const n=NAR.find(x=>x.id===id); if(!n)return;
+  const steps=FAZE.map((f,i)=>'<div class="step '+(i<n.faza?"done":(i===n.faza?"cur":""))+'"><span class="dot">'+(i<n.faza?"✓":(i+1))+'</span>'+f+'</div>'+(i<LAST?'<span class="arr">›</span>':'')).join("");
+  const late=isLate(n);
+  let h='<div class="mhead"><div><h2>'+n.kupac+'</h2><div class="msub">'+n.id+' · '+n.torta+'</div></div><div class="x" onclick="closeModal()">×</div></div>';
+  h+='<div class="mbody">';
+  if(late) h+='<div class="latebanner">⚠ Rok preuzimanja je prošao ('+dayName(n.offset)+", "+dateStr(n.offset)+" u "+n.vrijeme+"), a narudžba nije preuzeta. Nazovite kupca.</div>";
+  h+='<div class="stepper" style="margin-bottom:14px">'+steps+'</div>';
+  h+='<div class="kv"><div class="k">Rok preuzimanja</div><div class="v"><b>'+dayName(n.offset)+", "+dateStr(n.offset)+" u "+n.vrijeme+"</b> "+rokPill(n)+"</div></div>";
+  h+='<div class="kv"><div class="k">Kanal narudžbe</div><div class="v">'+chanTag(n)+" &nbsp; "+n.tel+"</div></div>";
+  h+='<div class="kv"><div class="k">Zaduženi majstor</div><div class="v">'+whoTag(n)+"</div></div>";
+  h+='<div class="sec-title">Torta</div>';
+  h+='<div class="kv"><div class="k">Vrsta i veličina</div><div class="v">'+n.torta+" · "+n.kg+" kg</div></div>";
+  h+='<div class="kv"><div class="k">Ukus i fil</div><div class="v">'+n.ukus+"</div></div>";
+  h+='<div class="kv"><div class="k">Dekoracija</div><div class="v">'+n.dekor+"</div></div>";
+  h+='<div class="kv"><div class="k">Alergije</div><div class="v">'+(n.alergije&&n.alergije!=="nema"?'<b style="color:var(--late)">'+n.alergije+"</b>":"nema")+"</div></div>";
+  h+='<div class="kv"><div class="k">Cijena</div><div class="v">'+money(n.cijena)+"</div></div>";
+  h+='<div class="sec-title">Natpis na torti</div><div class="natpis">„'+n.natpis+"“</div>";
+  if(n.nap) h+='<div class="sec-title">Napomena</div><div class="hint" style="font-size:13.5px">'+n.nap+"</div>";
+  h+='</div>';
+  h+='<div class="actions">';
+  if(!isDone(n)){
+    if(n.faza<3) h+='<button class="primary" onclick="advance(\''+n.id+'\')">Sljedeća faza: '+FAZE[n.faza+1]+'</button>';
+    else if(n.faza===3) h+='<button class="primary" onclick="advance(\''+n.id+'\')">Označi kao preuzeto</button>';
+  } else h+='<span class="hint">Narudžba je preuzeta i završena.</span>';
+  h+='<a class="callbtn" href="tel:'+n.tel.replace(/\s/g,"")+'"><button class="secondary">Pozovi kupca</button></a>';
+  if(n.kanal==="viber") h+='<a class="callbtn" href="viber://chat?number='+n.tel.replace(/\D/g,"")+'"><button class="secondary">Viber</button></a>';
+  h+='</div>';
+  el("modal").innerHTML=h;
+  el("overlay").classList.add("open");
+}
+function closeModal(){ el("overlay").classList.remove("open"); }
+function advance(id){
+  const n=NAR.find(x=>x.id===id); if(!n||isDone(n))return;
+  n.faza++;
+  if(el("overlay").classList.contains("open")&&n.faza<=LAST) openNar(id);
+  if(isDone(n)) closeModal();
+  render();
+}
+
+// ---- Nova narudžba --------------------------------------------------------
+function openNova(){
+  const opts=OSOBLJE.map((o,i)=>'<option value="'+i+'">'+o.n+"</option>").join("");
+  let h='<div class="mhead"><div><h2>Nova narudžba</h2><div class="msub">Torta po narudžbi</div></div><div class="x" onclick="closeModal()">×</div></div>';
+  h+='<div class="mbody">';
+  h+='<div class="frow"><label>Kupac *</label><input id="f_kupac" placeholder="Ime i prezime"></div>';
+  h+='<div class="row2"><div class="frow"><label>Telefon</label><input id="f_tel" placeholder="065 000 000"></div><div class="frow"><label>Kanal</label><select id="f_kanal"><option value="viber">Viber</option><option value="telefon">Telefon</option></select></div></div>';
+  h+='<div class="frow"><label>Vrsta torte *</label><input id="f_torta" placeholder="npr. Rođendanska torta (jednorog)"></div>';
+  h+='<div class="row2"><div class="frow"><label>Veličina (kg)</label><input id="f_kg" type="number" min="0" step="0.5" value="3"></div><div class="frow"><label>Ukus i fil</label><input id="f_ukus" placeholder="npr. čokolada i malina"></div></div>';
+  h+='<div class="frow"><label>Dekoracija</label><input id="f_dekor" placeholder="npr. roze fondan, figura"></div>';
+  h+='<div class="frow"><label>Natpis na torti</label><input id="f_natpis" placeholder="npr. Sretan rođendan, Sara"></div>';
+  h+='<div class="row2"><div class="frow"><label>Alergije</label><input id="f_alerg" placeholder="npr. orašasti plodovi"></div><div class="frow"><label>Cijena (KM)</label><input id="f_cijena" type="number" min="0" step="5" value="0"></div></div>';
+  h+='<div class="row2"><div class="frow"><label>Datum preuzimanja</label><input id="f_datum" type="date"></div><div class="frow"><label>Vrijeme</label><input id="f_vrijeme" type="time" value="16:00"></div></div>';
+  h+='<div class="frow"><label>Zaduženi majstor</label><select id="f_ko">'+opts+'</select></div>';
+  h+='</div>';
+  h+='<div class="actions"><button class="primary" onclick="createNar()">Sačuvaj narudžbu</button><span class="hint">Nova narudžba kreće od faze „Primljeno“.</span></div>';
+  el("modal").innerHTML=h;
+  const d=new Date(); d.setDate(d.getDate()+2);
+  el("f_datum").value=d.getFullYear()+"-"+m2(d.getMonth()+1)+"-"+m2(d.getDate());
+  el("overlay").classList.add("open");
+  setTimeout(()=>el("f_kupac").focus(),40);
+}
+function createNar(){
+  const kupac=(el("f_kupac").value||"").trim();
+  const torta=(el("f_torta").value||"").trim();
+  if(!kupac){ el("f_kupac").focus(); return; }
+  if(!torta){ el("f_torta").focus(); return; }
+  let offset=2;
+  const dv=el("f_datum").value;
+  if(dv){ const d0=new Date(); d0.setHours(0,0,0,0); const d1=new Date(dv); offset=Math.round((d1-d0)/86400000); }
+  const nums=NAR.map(n=>+n.id.split("-")[1]).filter(x=>!isNaN(x));
+  const id="SL-"+(Math.max(0,...nums)+1);
+  NAR.unshift({
+    id, kupac, tel:(el("f_tel").value||"").trim()||"—", kanal:el("f_kanal").value,
+    torta, kg:parseFloat(el("f_kg").value)||0, ukus:(el("f_ukus").value||"").trim()||"—",
+    dekor:(el("f_dekor").value||"").trim()||"—", natpis:(el("f_natpis").value||"").trim()||"—",
+    alergije:(el("f_alerg").value||"").trim()||"nema", cijena:parseFloat(el("f_cijena").value)||0,
+    offset, vrijeme:el("f_vrijeme").value||"16:00", faza:0, ko:parseInt(el("f_ko").value)||0, nap:""
+  });
+  closeModal(); setView("tabla"); openNar(id);
+}
+
+setView("danas");
+</script>
+
+<script>
+/* Signal na ntfy kad slastičarna stvarno otvori i zadrži se na prototipu (filtrira botove) */
+(function(){
+  var TOPIC='datamaks-posjete-7g3x', KEY='dm_slasticarna_ntfy';
+  try{ if(sessionStorage.getItem(KEY)) return; }catch(e){}
+  function send(){
+    try{ if(sessionStorage.getItem(KEY)) return; sessionStorage.setItem(KEY,'1'); }catch(e){}
+    var ref = document.referrer ? (' · izvor: '+document.referrer.replace(/^https?:\/\//,'').split('/')[0]) : '';
+    var utm = /utm_content=slasticarna/.test(location.search) ? ' (iz maila)' : '';
+    fetch('https://ntfy.sh/'+TOPIC,{method:'POST',
+      body:'Slasticarna (Rasida) je otvorila prototip i zadrzala se na njemu'+utm+'.'+ref+'\nhttps://demo.datamaks.net/m/31972ac58b/'
+    }).catch(function(){});
+  }
+  var sec=0, iv=setInterval(function(){
+    if(document.visibilityState==='visible'){ sec++; if(sec>=12){ clearInterval(iv); send(); } }
+  },1000);
+  ['pointerdown','keydown'].forEach(function(ev){
+    document.addEventListener(ev, function h(){ document.removeEventListener(ev,h); setTimeout(send,3000); }, {once:true});
+  });
+})();
+</script>
+<script src="/assets/consent.js"></script>
+</body>
+</html>
