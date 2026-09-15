@@ -8,6 +8,17 @@ export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 export const DATA = join(ROOT, "data", "mockups.json");
 export const DEMO_BASE = "https://demo.datamaks.net";
 
+// ntfy: javi na Milanov telefon SVAKI dogadjaj generatora (zahtjev + svaki ishod).
+// Naslov/tagovi moraju biti ASCII (ntfy headeri), poruka (body) moze biti UTF-8.
+export const NTFY_GEN_TOPIC = process.env.NTFY_GEN_TOPIC || "datamaks-generator-7q2m";
+export async function notifyGen(body, { title = "Generator", priority = "default", tags = "" } = {}) {
+  try {
+    const headers = { Title: title, Priority: priority };
+    if (tags) headers.Tags = tags;
+    await fetch(`https://ntfy.sh/${NTFY_GEN_TOPIC}`, { method: "POST", headers, body: String(body) });
+  } catch (e) { console.error("ntfy greška:", e.message); }
+}
+
 export function loadMockups() {
   if (!existsSync(DATA)) return [];
   try { return JSON.parse(readFileSync(DATA, "utf8")); } catch { return []; }
