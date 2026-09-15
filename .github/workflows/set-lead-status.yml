@@ -1,0 +1,28 @@
+name: Postavi status leada
+
+on:
+  workflow_dispatch:
+    inputs:
+      id:
+        description: "mockup_id leada"
+        required: true
+      status:
+        description: "queued | live | archived | rejected"
+        required: true
+        default: "live"
+
+jobs:
+  set:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Postavi status
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          LEAD_ID: ${{ github.event.inputs.id }}
+          LEAD_STATUS: ${{ github.event.inputs.status }}
+        run: node scripts/set-lead-status.mjs
