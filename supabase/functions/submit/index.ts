@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
 
   // Bez auto-generisanja: javi Milanu na ntfy CIJELU poruku korisnika, da je kopira u Claude Code.
   await ntfy(
-    `NOVI ZAHTJEV za prototip (napravi ručno).\nEmail: ${email}\nTel: ${telefon}\nDjelatnost: ${tip || "-"}\n\nPORUKA KORISNIKA:\n${opis}`,
+    `NOVI ZAHTJEV za prototip (napravi ručno).\nID: ${id}\nEmail: ${email}\nTel: ${telefon}\nDjelatnost: ${tip || "-"}\n\nPORUKA KORISNIKA:\n${opis}`,
     "Novi zahtjev za prototip", "high", "inbox_tray");
   return json(200, { ok: true, id });
 });
