@@ -1,8 +1,9 @@
 // Supabase Edge Function: prima formu, validira, provjeri rate-limit
-// (1 mockup po kombinaciji email+telefon), upiše lead, okine GitHub Action.
+// (1 po kombinaciji email+telefon), upiše lead i javi Milanu na ntfy sa cijelom porukom.
+// NE pokreće auto-generisanje — od 2026-09-15 prototipe pravi Claude Code ručno
+// (Milan kopira poruku iz ntfy). Nema više Claude API poziva iz generatora.
 //
-// Env (Supabase secrets): SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
-//   GITHUB_TOKEN (repo/workflow scope), GITHUB_REPO ("Zljebun/datamaks-mockups")
+// Env (Supabase secrets): SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 //
 // Deploy: supabase functions deploy submit --no-verify-jwt
 
@@ -36,8 +37,6 @@ Deno.serve(async (req) => {
 
   const SB = Deno.env.get("SUPABASE_URL")!;
   const KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const GH_TOKEN = Deno.env.get("GITHUB_TOKEN")!;
-  const GH_REPO = Deno.env.get("GITHUB_REPO")!;
 
   let p: any;
   try { p = await req.json(); } catch { return json(400, { error: "Neispravan zahtjev" }); }
@@ -71,8 +70,8 @@ Deno.serve(async (req) => {
   );
   const existing = await check.json().catch(() => []);
   if (Array.isArray(existing) && existing.length > 0) {
-    await ntfy(`Ponovljeni zahtjev (rate-limit, već postoji prototip).\nEmail: ${email}\nTel: ${telefon}`, "Forma: ponovljeno", "default", "repeat");
-    return json(409, { error: "Prototip za ovu kombinaciju je već napravljen." });
+    await ntfy(`Ponovljeni zahtjev (već postoji za ovu kombinaciju).\nEmail: ${email}\nTel: ${telefon}`, "Forma: ponovljeno", "default", "repeat");
+    return json(409, { error: "Već smo primili vaš zahtjev, javićemo vam se uskoro." });
   }
 
   const id = newId();
@@ -81,31 +80,16 @@ Deno.serve(async (req) => {
   const ins = await fetch(`${SB}/rest/v1/datamaks_leads`, {
     method: "POST",
     headers: { ...sbHeaders, Prefer: "return=minimal" },
-    body: JSON.stringify({ mockup_id: id, email, telefon, tip, opis, status: "queued" }),
+    body: JSON.stringify({ mockup_id: id, email, telefon, tip, opis, status: "novo" }),
   });
   if (!ins.ok) {
     await ntfy(`GREŠKA pri upisu leada u bazu.\nEmail: ${email}\nOpis: ${snip}`, "Forma: upis pao", "urgent", "rotating_light");
     return json(500, { error: "Greška pri upisu" });
   }
 
-  // Okini GitHub Action
-  const dispatch = await fetch(`https://api.github.com/repos/${GH_REPO}/dispatches`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${GH_TOKEN}`,
-      Accept: "application/vnd.github+json",
-      "Content-Type": "application/json",
-      "User-Agent": "datamaks-mockups",
-    },
-    body: JSON.stringify({ event_type: "generate-mockup", client_payload: { id, email, telefon, tip, opis } }),
-  });
-  if (!dispatch.ok) {
-    const t = await dispatch.text();
-    console.error("dispatch fail", dispatch.status, t);
-    await ntfy(`Zahtjev UPISAN ali pokretanje generisanja PALO (HTTP ${dispatch.status}).\nEmail: ${email}\nID: ${id}\nOpis: ${snip}`, "Forma: dispatch pao", "urgent", "rotating_light");
-    return json(502, { error: "Greška pri pokretanju generisanja" });
-  }
-
-  await ntfy(`NOVI ZAHTJEV za prototip primljen i pokrenut.\nEmail: ${email}\nTel: ${telefon}\nDjelatnost: ${tip || "-"}\nOpis: ${snip}`, "Novi zahtjev", "high", "inbox_tray");
+  // Bez auto-generisanja: javi Milanu na ntfy CIJELU poruku korisnika, da je kopira u Claude Code.
+  await ntfy(
+    `NOVI ZAHTJEV za prototip (napravi ručno).\nEmail: ${email}\nTel: ${telefon}\nDjelatnost: ${tip || "-"}\n\nPORUKA KORISNIKA:\n${opis}`,
+    "Novi zahtjev za prototip", "high", "inbox_tray");
   return json(200, { ok: true, id });
 });

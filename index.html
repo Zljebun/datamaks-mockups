@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Napravite besplatan prototip · Datamaks</title>
-<meta name="description" content="Opišite svoj posao i problem, a mi vam napravimo klikabilni prototip softvera i pošaljemo link na mail.">
+<meta name="description" content="Opišite svoj posao i problem, a mi vam napravimo klikabilni prototip softvera po mjeri i javimo se.">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
@@ -33,7 +33,7 @@
 <body>
   <div class="hero">
     <h1>Napravite besplatan prototip za svoj posao</h1>
-    <p>Opišite čime se bavite i šta vas muči. Napravimo vam klikabilni prototip softvera i pošaljemo link na mail.</p>
+    <p>Opišite čime se bavite i šta vas muči. Napravimo vam klikabilni prototip softvera po mjeri i javimo se sa linkom.</p>
   </div>
   <div class="wrap">
     <div class="card">
@@ -67,7 +67,7 @@
           <div class="cnt"><span id="cc">0</span>/600</div>
         </div>
         <button class="go" id="go" type="submit">Napravite mi prototip →</button>
-        <div class="foot">Prototip stiže na vaš mail za par minuta · bez naplate · Datamaks</div>
+        <div class="foot">Prototip po mjeri · bez naplate · Datamaks</div>
       </form>
       <div class="msg" id="msg"></div>
     </div>
@@ -96,10 +96,10 @@ form.addEventListener('submit', async (e)=>{
       if(window.gtag) gtag('event','mockup_request',{tip:payload.tip||'(nepoznato)'});
       form.style.display="none";
       msg.className="msg ok";
-      msg.innerHTML="<b>Hvala!</b> Vaš prototip se pravi. Za par minuta stiže link na <b>"+payload.email+"</b>. Provjerite i spam/promocije.";
+      msg.innerHTML="<b>Hvala!</b> Primili smo vaš zahtjev. Napravićemo prototip po mjeri i javiti vam se na <b>"+payload.email+"</b>.";
     }else if(r.status===409){
       msg.className="msg err";
-      msg.textContent="Za ovu kombinaciju emaila i telefona je već napravljen prototip. Za novi ili punu verziju javite se na datamaks.net.";
+      msg.textContent="Za ovu kombinaciju emaila i telefona već imamo vaš zahtjev. Za punu verziju javite se na datamaks.net.";
       go.disabled=false; go.textContent="Napravite mi prototip →";
     }else{
       throw new Error(d.error||"Greška");
