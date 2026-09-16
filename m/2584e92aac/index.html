@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frizerski salon · raspored termina (demo)</title>
+<meta name="description" content="Klikabilni demo prototip za frizerski salon: raspored termina po danu i po radnici, sa uslugom i trajanjem, ko je slobodan i sprječavanje preklapanja. Izmišljeni podaci, stvarna logika.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://demo.datamaks.net/m/2584e92aac/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%236d28d9'/%3E%3Ctext%20x='32'%20y='45'%20font-size='32'%20text-anchor='middle'%3E%E2%9C%82%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --brand:#6d28d9; --brand2:#8b5cf6; --accent:#db2777; --action:#6d28d9;
+    --bg:#faf7fe; --card:#fff; --line:#ece4f7; --muted:#6b6478; --text:#231d2e;
+    --ok:#3f7d4e; --warn:#b45309; --late:#c02626; --track:#f0eafa;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  header{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:11px 20px;display:flex;align-items:center;gap:13px}
+  .monogram{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:19px}
+  .brand .name{font-weight:800;font-size:16px;line-height:1}
+  .brand .tag{font-size:11.5px;color:#ede9fe;margin-top:3px}
+  header .spacer{flex:1}
+  .user{display:flex;align-items:center;gap:8px;font-size:13px}
+  .avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;background:var(--accent)}
+  .toolbar{display:flex;align-items:center;gap:6px;padding:0 20px;border-bottom:1px solid var(--line);background:#fff;flex-wrap:wrap}
+  .tab{padding:14px 12px 12px;font-size:15px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer}
+  .tab.active{color:var(--brand);border-bottom-color:var(--brand)}
+  .demo-flag{margin-left:10px;background:#f3e8ff;color:var(--brand);border:1px solid #e2ccff;padding:4px 10px;border-radius:6px;font-size:12px;align-self:center}
+  .newbtn{margin-left:auto;background:var(--action);color:#fff;border:0;padding:8px 14px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;align-self:center}
+  .newbtn:hover{filter:brightness(1.07)}
+  .wrap{padding:16px 20px;max-width:1100px;margin:0 auto}
+  .viberCta{margin:12px 20px;padding:14px 16px;border-radius:14px;background:#f5efff;border:1px solid #e2ccff;max-width:1100px}
+  .viberCta .t{font-size:13.5px;line-height:1.55;margin-bottom:10px}
+  .viberCta .btns{display:flex;gap:10px;flex-wrap:wrap}
+  .viberCta a{padding:11px 18px;border-radius:999px;font-weight:700;font-size:14px;text-decoration:none;color:#fff}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 16px}
+  .kpi .big{font-size:22px;font-weight:800;color:var(--brand)}
+  .kpi .lab{font-size:12.5px;color:var(--muted);margin-top:4px}
+
+  .datenav{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .datenav button{background:#fff;border:1px solid var(--line);border-radius:9px;width:36px;height:36px;font-size:18px;cursor:pointer;color:var(--brand);font-weight:700}
+  .datenav button:hover{background:var(--track)}
+  .datenav .lbl{font-weight:700;font-size:15px;color:var(--brand)}
+  .datenav .today{width:auto;padding:0 12px;font-size:13px;height:34px}
+
+  .schedwrap{overflow-x:auto;padding-bottom:6px}
+  .sched{display:flex;gap:8px;min-width:440px}
+  .timecol{flex:0 0 46px;padding-top:34px}
+  .timecol .h{height:60px;font-size:11px;color:var(--muted);text-align:right;padding-right:6px;transform:translateY(-6px)}
+  .rcol{flex:1 1 0;min-width:170px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .rhead{color:#fff;font-weight:700;font-size:13.5px;padding:8px 12px;text-align:center;display:flex;align-items:center;justify-content:center;gap:7px;height:34px}
+  .rbody{position:relative;height:600px;background:repeating-linear-gradient(#fff,#fff 59px,var(--line) 59px,var(--line) 60px)}
+  .appt{position:absolute;left:5px;right:5px;border-radius:8px;padding:4px 7px;font-size:11.5px;line-height:1.25;color:#fff;overflow:hidden;cursor:pointer;box-shadow:0 1px 3px rgba(60,30,90,.18)}
+  .appt .u{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .appt .c{opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .appt.done{background:#94a3b8 !important;opacity:.7}
+  .appt.otk{background:#fca5a5 !important;text-decoration:line-through;opacity:.7}
+  .freehint{position:absolute;left:0;right:0;text-align:center;font-size:10.5px;color:#a99fc0}
+
+  .pill{padding:2px 9px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+  .chan{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+  .chan.telefon{background:#e5f0ff;color:#1f5fbf}
+  .chan.instagram{background:#fde5f3;color:#be1e73}
+  .who{font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff}
+  .st-rez{background:#ede9fe;color:#6d28d9}.st-gotovo{background:#dff0e3;color:#2f7d46}.st-otk{background:#fde2e2;color:#b91c1c}
+
+  .tbl{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14px}
+  .tbl thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);padding:11px 13px;background:var(--track);border-bottom:1px solid var(--line)}
+  .tbl td{padding:10px 13px;border-bottom:1px solid var(--line)}
+  .tbl tbody tr{cursor:pointer}.tbl tbody tr:hover{background:var(--track)}
+  .tbl tbody tr:last-child td{border-bottom:0}
+
+  .bar{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:14px}
+  .bar .blab{width:120px;display:flex;align-items:center;gap:7px}
+  .bar .track{flex:1;background:var(--track);border-radius:6px;height:18px;overflow:hidden}
+  .bar .fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--brand2),var(--brand))}
+  .bar .val{width:110px;text-align:right;color:var(--muted)}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+  .panel h3{margin:0 0 12px;font-size:12px;text-transform:uppercase;letter-spacing:.3px;color:var(--brand)}
+
+  .overlay{position:fixed;inset:0;background:rgba(50,25,80,.5);display:none;align-items:flex-start;justify-content:center;padding:28px 16px;overflow:auto;z-index:50}
+  .overlay.open{display:flex}
+  .modal{background:#fff;border-radius:16px;max-width:560px;width:100%;box-shadow:0 20px 60px rgba(50,25,80,.35);overflow:hidden}
+  .mhead{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:16px 20px;display:flex;align-items:flex-start;gap:12px}
+  .mhead h2{margin:0;font-size:19px}
+  .mhead .msub{font-size:12.5px;color:#ede9fe;margin-top:3px}
+  .mhead .x{margin-left:auto;cursor:pointer;font-size:22px;opacity:.9}
+  .mbody{padding:18px 20px}
+  .kv{display:flex;font-size:14.5px;padding:5px 0;border-bottom:1px dashed #eee2f7}
+  .kv .k{width:120px;color:var(--muted)}.kv .v{flex:1}
+  .warnbox{background:#fee2e2;border:1px solid #f6c2c2;color:#8f1d1d;border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:10px;font-weight:600;display:none}
+  .okbox{background:#dff0e3;border:1px solid #b6e0c2;color:#2f7d46;border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:10px;font-weight:600;display:none}
+  .actions{padding:14px 20px;background:#faf7fe;border-top:1px solid var(--line);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  button.primary{background:var(--action);color:#fff;border:0;padding:10px 15px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}
+  button.primary:hover{filter:brightness(1.08)}
+  button.primary:disabled{opacity:.5;cursor:not-allowed}
+  button.secondary{background:#fff;color:var(--brand);border:1px solid #dcc9f2;padding:9px 13px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13.5px}
+  a.callbtn{text-decoration:none}
+  .hint{font-size:12.5px;color:var(--muted)}
+  .frow{margin-bottom:12px;display:flex;flex-direction:column;gap:4px}
+  .frow label{font-size:13px;color:var(--muted);font-weight:600}
+  .frow input,.frow select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:var(--text)}
+  .frow input:focus,.frow select:focus{outline:none;border-color:var(--brand2)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:560px){.row2{grid-template-columns:1fr}.kv{flex-direction:column;gap:1px}.kv .k{width:auto}}
+  footer{padding:16px 20px;color:var(--muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="monogram">✂️</div>
+  <div class="brand">
+    <div class="name">Frizerski salon</div>
+    <div class="tag">Raspored termina · umjesto rokovnika</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="user"><span class="avatar">FS</span><span>Recepcija</span></div>
+</header>
+
+<div class="toolbar">
+  <div class="tab active" data-view="raspored" onclick="setView('raspored')">Raspored</div>
+  <div class="tab" data-view="lista" onclick="setView('lista')">Svi termini</div>
+  <div class="tab" data-view="pregled" onclick="setView('pregled')">Pregled</div>
+  <button class="newbtn" onclick="openNova()">+ Nova rezervacija</button>
+  <span class="demo-flag">DEMO · izmišljeni podaci</span>
+</div>
+
+<div class="viberCta">
+  <div class="t"><b>Ovaj prototip je napravljen baš za vaš frizerski salon.</b> Na osnovu onoga što ste opisali, termini koji stižu telefonom i preko Instagrama, ovako bi izgledalo kad umjesto rokovnika sve stoji na jednom mjestu: raspored po danu i po radnici, sa uslugom i trajanjem, odmah se vidi ko je slobodan, a sistem ne da da se termini preklope. Sviđa vam se? Javite se pa da ga prilagodimo tačno vašem radu.</div>
+  <div class="btns">
+    <a href="viber://add?number=38765469565" data-kanal="viber" style="background:#7360F2">Pišite na Viber</a>
+    <a href="https://wa.me/436677970082" target="_blank" rel="noopener" data-kanal="whatsapp" style="background:#25D366">WhatsApp</a>
+    <a href="tel:+38765469565" data-kanal="telefon" style="background:#231d2e">Pozovi</a>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.viberCta [data-kanal]').forEach(function(a){a.addEventListener('click',function(){var k=a.getAttribute('data-kanal');if(window.gtag)gtag('event','kontakt_klik',{kanal:k,stranica:'mockup-frizer'});});});
+</script>
+
+<div id="view" class="wrap"></div>
+<footer>Demo prototip · podaci su izmišljeni · © Datamaks</footer>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+// ---- Model ----------------------------------------------------------------
+const RADNICE = [ {n:"Amina", boja:"#6d28d9"}, {n:"Lejla", boja:"#db2777"} ];
+const USLUGE = [
+  {n:"Šišanje", t:30}, {n:"Šišanje i feniranje", t:45}, {n:"Feniranje", t:30},
+  {n:"Farbanje", t:120}, {n:"Pramenovi / balayage", t:150}, {n:"Tretman za kosu", t:45},
+  {n:"Svečana frizura", t:60}, {n:"Šišanje (muško)", t:20},
+];
+const START=9*60, END=19*60, PXMIN=1; // 09:00-19:00, 1px/min -> 600px
+
+// termin: musterija, tel, kanal, usluga(idx), radnica(idx), offset(dan), start "HH:MM", status, nap
+let TERM = [
+  {id:"T-501", musterija:"Ajla Mehić",    tel:"065 111 222", kanal:"instagram", usluga:3, radnica:0, offset:0, start:"09:00", status:"gotovo",     nap:""},
+  {id:"T-502", musterija:"Ena Kovač",     tel:"061 333 444", kanal:"telefon",   usluga:1, radnica:0, offset:0, start:"11:15", status:"rezervisano", nap:""},
+  {id:"T-503", musterija:"Selma Begić",   tel:"063 555 666", kanal:"instagram", usluga:4, radnica:0, offset:0, start:"12:30", status:"rezervisano", nap:"Balayage, duga kosa."},
+  {id:"T-504", musterija:"Lamija Hodžić", tel:"062 777 888", kanal:"telefon",   usluga:0, radnica:0, offset:0, start:"15:30", status:"rezervisano", nap:""},
+  {id:"T-505", musterija:"Amra Suljić",   tel:"065 999 000", kanal:"instagram", usluga:6, radnica:0, offset:0, start:"17:00", status:"rezervisano", nap:"Svečana frizura za vjenčanje."},
+  {id:"T-506", musterija:"Merjem Alić",   tel:"061 121 314", kanal:"telefon",   usluga:0, radnica:1, offset:0, start:"09:30", status:"gotovo",     nap:""},
+  {id:"T-507", musterija:"Nina Ramić",    tel:"063 151 617", kanal:"instagram", usluga:2, radnica:1, offset:0, start:"10:15", status:"rezervisano", nap:""},
+  {id:"T-508", musterija:"Dženana Bešić", tel:"065 181 920", kanal:"telefon",   usluga:5, radnica:1, offset:0, start:"11:00", status:"rezervisano", nap:""},
+  {id:"T-509", musterija:"Ilma Softić",   tel:"062 212 223", kanal:"instagram", usluga:3, radnica:1, offset:0, start:"13:00", status:"rezervisano", nap:"Alergija na amonijak, koristiti blagu boju."},
+  {id:"T-510", musterija:"Hana Mujić",    tel:"061 242 526", kanal:"telefon",   usluga:1, radnica:1, offset:0, start:"16:00", status:"rezervisano", nap:""},
+  {id:"T-511", musterija:"Vedad Đelilović",tel:"063 272 829",kanal:"telefon",   usluga:7, radnica:0, offset:1, start:"10:00", status:"rezervisano", nap:""},
+  {id:"T-512", musterija:"Tea Marić",     tel:"065 303 132", kanal:"instagram", usluga:4, radnica:1, offset:1, start:"11:30", status:"rezervisano", nap:""},
+];
+
+// ---- Helperi --------------------------------------------------------------
+const el=id=>document.getElementById(id);
+const m2=n=>String(n).padStart(2,"0");
+let VIEW="raspored", DAN=0;
+const toMin=s=>{const p=s.split(":");return (+p[0])*60+(+p[1]);};
+const fromMin=m=>m2(Math.floor(m/60))+":"+m2(m%60);
+const uslugaN=t=>USLUGE[t.usluga].n, uslugaT=t=>USLUGE[t.usluga].t;
+const endMin=t=>toMin(t.start)+uslugaT(t);
+function dateStr(off){const d=new Date();d.setDate(d.getDate()+off);return d.getDate()+"."+m2(d.getMonth()+1)+".";}
+function dayName(off){const dani=["nedjelja","ponedjeljak","utorak","srijeda","četvrtak","petak","subota"];const d=new Date();d.setDate(d.getDate()+off);return dani[d.getDay()];}
+function ymd(off){const d=new Date();d.setDate(d.getDate()+off);return d.getFullYear()+"-"+m2(d.getMonth()+1)+"-"+m2(d.getDate());}
+const chanTag=t=>'<span class="chan '+t.kanal+'">'+(t.kanal==="instagram"?"Instagram":"Telefon")+"</span>";
+const whoTag=i=>'<span class="who" style="background:'+RADNICE[i].boja+'">'+RADNICE[i].n+"</span>";
+function stTag(s){return s==="gotovo"?'<span class="pill st-gotovo">gotovo</span>':s==="otkazano"?'<span class="pill st-otk">otkazano</span>':'<span class="pill st-rez">rezervisano</span>';}
+// preklapanje termina za istu radnicu i dan
+function overlap(radnica,off,sMin,dur,exceptId){
+  return TERM.find(t=>t.id!==exceptId && t.radnica===radnica && t.offset===off && t.status!=="otkazano"
+    && sMin < endMin(t) && (sMin+dur) > toMin(t.start));
+}
+
+// ---- Render ---------------------------------------------------------------
+function setView(v){VIEW=v;document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===v));render();}
+function render(){ if(VIEW==="raspored")return renderRaspored(); if(VIEW==="lista")return renderLista(); return renderPregled(); }
+
+function kpiRow(){
+  const danas=TERM.filter(t=>t.offset===DAN&&t.status!=="otkazano");
+  const a=danas.filter(t=>t.radnica===0).length, l=danas.filter(t=>t.radnica===1).length;
+  // prva slobodna po radnici (od sad, gruba procjena: zadnji kraj)
+  function prvaSlobodna(ri){
+    const zauzeti=TERM.filter(t=>t.radnica===ri&&t.offset===DAN&&t.status!=="otkazano").sort((x,y)=>toMin(x.start)-toMin(y.start));
+    let c=START; for(const t of zauzeti){ if(toMin(t.start)>=c+15) break; c=Math.max(c,endMin(t)); }
+    return c<END?fromMin(c):"popunjeno";
+  }
+  return '<div class="kpis">'+
+    '<div class="kpi"><div class="big">'+danas.length+'</div><div class="lab">Termina '+(DAN===0?"danas":dateStr(DAN))+'</div></div>'+
+    '<div class="kpi"><div class="big">'+a+'</div><div class="lab">Amina</div></div>'+
+    '<div class="kpi"><div class="big">'+l+'</div><div class="lab">Lejla</div></div>'+
+    '<div class="kpi"><div class="big" style="font-size:18px">'+prvaSlobodna(0)+' / '+prvaSlobodna(1)+'</div><div class="lab">Prva slobodna (A / L)</div></div>'+
+  '</div>';
+}
+
+function dateNav(){
+  return '<div class="datenav"><button onclick="changeDay(-1)">‹</button>'+
+    '<span class="lbl">'+dayName(DAN)+', '+dateStr(DAN)+'</span>'+
+    '<button onclick="changeDay(1)">›</button>'+
+    (DAN!==0?'<button class="today" onclick="goToday()">danas</button>':'')+'</div>';
+}
+function changeDay(d){DAN+=d;render();}
+function goToday(){DAN=0;render();}
+
+function renderRaspored(){
+  let h=kpiRow()+dateNav();
+  h+='<div class="hint" style="margin-bottom:8px">Raspored 09:00 do 19:00. Svaki blok je termin (visina = trajanje). Prazan prostor znači slobodno. Klik na termin otvara detalje.</div>';
+  h+='<div class="schedwrap"><div class="sched">';
+  // time col
+  h+='<div class="timecol">';
+  for(let hh=9;hh<19;hh++) h+='<div class="h">'+m2(hh)+':00</div>';
+  h+='</div>';
+  RADNICE.forEach((r,ri)=>{
+    h+='<div class="rcol"><div class="rhead" style="background:'+r.boja+'">'+r.n+'</div><div class="rbody">';
+    const dnevni=TERM.filter(t=>t.radnica===ri&&t.offset===DAN&&t.status!=="otkazano");
+    if(!dnevni.length) h+='<div class="freehint" style="top:280px">slobodno cijeli dan</div>';
+    dnevni.forEach(t=>{
+      const top=(toMin(t.start)-START)*PXMIN, hgt=Math.max(uslugaT(t)*PXMIN-2,20);
+      const cls=t.status==="gotovo"?" done":(t.status==="otkazano"?" otk":"");
+      h+='<div class="appt'+cls+'" style="top:'+top+'px;height:'+hgt+'px;background:'+r.boja+'" onclick="openTermin(\''+t.id+'\')">'+
+         '<div class="u">'+t.start+' '+uslugaN(t)+'</div><div class="c">'+t.musterija+'</div></div>';
+    });
+    h+='</div></div>';
+  });
+  h+='</div></div>';
+  el("view").innerHTML=h;
+}
+
+function renderLista(){
+  let h='<div class="datenav" style="margin-bottom:12px"><span class="lbl">Svi termini (danas i naredni dani)</span></div>';
+  const rows=TERM.slice().sort((a,b)=>a.offset-b.offset || toMin(a.start)-toMin(b.start));
+  h+='<table class="tbl"><thead><tr><th>Dan</th><th>Vrijeme</th><th>Mušterija</th><th>Usluga</th><th>Radnica</th><th>Kanal</th><th>Status</th></tr></thead><tbody>';
+  h+=rows.map(t=>'<tr onclick="openTermin(\''+t.id+'\')">'+
+     '<td data-label="Dan">'+dateStr(t.offset)+'</td>'+
+     '<td data-label="Vrijeme"><b>'+t.start+'</b> <span class="hint">'+uslugaT(t)+' min</span></td>'+
+     '<td data-label="Mušterija">'+t.musterija+'</td>'+
+     '<td data-label="Usluga">'+uslugaN(t)+'</td>'+
+     '<td data-label="Radnica">'+whoTag(t.radnica)+'</td>'+
+     '<td data-label="Kanal">'+chanTag(t)+'</td>'+
+     '<td data-label="Status">'+stTag(t.status)+'</td></tr>').join("");
+  h+='</tbody></table>';
+  el("view").innerHTML=h;
+}
+
+function renderPregled(){
+  let h=kpiRow();
+  const danas=TERM.filter(t=>t.offset===DAN&&t.status!=="otkazano");
+  h+='<div class="panel"><h3>Zauzetost po radnici ('+(DAN===0?"danas":dateStr(DAN))+')</h3>';
+  const radnoMin=END-START;
+  RADNICE.forEach((r,ri)=>{
+    const zauz=danas.filter(t=>t.radnica===ri).reduce((s,t)=>s+uslugaT(t),0);
+    const pct=Math.min(100,Math.round(zauz/radnoMin*100));
+    h+='<div class="bar"><div class="blab">'+whoTag(ri)+'</div><div class="track"><div class="fill" style="width:'+pct+'%;background:'+r.boja+'"></div></div><div class="val">'+pct+'% ('+Math.round(zauz/60*10)/10+' h)</div></div>';
+  });
+  h+='</div>';
+  // usluge danas
+  const brU={}; danas.forEach(t=>brU[t.usluga]=(brU[t.usluga]||0)+1);
+  h+='<div class="panel"><h3>Usluge '+(DAN===0?"danas":dateStr(DAN))+'</h3>';
+  const keys=Object.keys(brU).sort((a,b)=>brU[b]-brU[a]);
+  if(!keys.length) h+='<div class="hint">Nema termina.</div>';
+  keys.forEach(k=>{ h+='<div class="bar"><div class="blab" style="width:150px">'+USLUGE[k].n+'</div><div class="track"><div class="fill" style="width:'+(brU[k]/danas.length*100)+'%"></div></div><div class="val">'+brU[k]+'</div></div>'; });
+  h+='</div>';
+  el("view").innerHTML=h;
+}
+
+// ---- Detalj termina -------------------------------------------------------
+function openTermin(id){
+  const t=TERM.find(x=>x.id===id); if(!t)return;
+  let h='<div class="mhead"><div><h2>'+t.musterija+'</h2><div class="msub">'+dayName(t.offset)+', '+dateStr(t.offset)+' u '+t.start+' · '+t.id+'</div></div><div class="x" onclick="closeModal()">×</div></div>';
+  h+='<div class="mbody">';
+  h+='<div class="kv"><div class="k">Termin</div><div class="v"><b>'+t.start+' do '+fromMin(endMin(t))+'</b> ('+uslugaT(t)+' min) '+stTag(t.status)+'</div></div>';
+  h+='<div class="kv"><div class="k">Usluga</div><div class="v">'+uslugaN(t)+'</div></div>';
+  h+='<div class="kv"><div class="k">Radnica</div><div class="v">'+whoTag(t.radnica)+'</div></div>';
+  h+='<div class="kv"><div class="k">Kontakt</div><div class="v">'+chanTag(t)+' &nbsp; '+t.tel+'</div></div>';
+  if(t.nap) h+='<div class="kv"><div class="k">Napomena</div><div class="v">'+t.nap+'</div></div>';
+  h+='</div>';
+  h+='<div class="actions">';
+  if(t.status==="rezervisano"){
+    h+='<button class="primary" onclick="setStatus(\''+t.id+'\',\'gotovo\')">Označi kao gotovo</button>';
+    h+='<button class="secondary" onclick="setStatus(\''+t.id+'\',\'otkazano\')">Otkaži termin</button>';
+  } else if(t.status==="gotovo"){ h+='<span class="hint">Termin je završen.</span>'; }
+  else { h+='<span class="hint">Termin je otkazan.</span> <button class="secondary" onclick="setStatus(\''+t.id+'\',\'rezervisano\')">Vrati</button>'; }
+  h+='<a class="callbtn" href="tel:'+t.tel.replace(/\s/g,"")+'"><button class="secondary">Pozovi</button></a>';
+  h+='</div>';
+  el("modal").innerHTML=h; el("overlay").classList.add("open");
+}
+function setStatus(id,s){const t=TERM.find(x=>x.id===id);if(!t)return;t.status=s;openTermin(id);render();}
+function closeModal(){el("overlay").classList.remove("open");}
+
+// ---- Nova rezervacija -----------------------------------------------------
+function openNova(){
+  const uOpts=USLUGE.map((u,i)=>'<option value="'+i+'">'+u.n+' ('+u.t+' min)</option>').join("");
+  const rOpts=RADNICE.map((r,i)=>'<option value="'+i+'">'+r.n+'</option>').join("");
+  let h='<div class="mhead"><div><h2>Nova rezervacija</h2><div class="msub">Termin za frizerski salon</div></div><div class="x" onclick="closeModal()">×</div></div>';
+  h+='<div class="mbody">';
+  h+='<div class="warnbox" id="w_over"></div><div class="okbox" id="w_ok"></div>';
+  h+='<div class="frow"><label>Mušterija *</label><input id="n_ime" placeholder="Ime i prezime"></div>';
+  h+='<div class="row2"><div class="frow"><label>Telefon</label><input id="n_tel" placeholder="065 000 000"></div><div class="frow"><label>Kanal</label><select id="n_kanal"><option value="telefon">Telefon</option><option value="instagram">Instagram</option></select></div></div>';
+  h+='<div class="row2"><div class="frow"><label>Usluga</label><select id="n_usl" onchange="checkFree()">'+uOpts+'</select></div><div class="frow"><label>Radnica</label><select id="n_rad" onchange="checkFree()">'+rOpts+'</select></div></div>';
+  h+='<div class="row2"><div class="frow"><label>Datum</label><input id="n_dat" type="date" onchange="checkFree()"></div><div class="frow"><label>Vrijeme</label><input id="n_vr" type="time" value="09:00" step="900" onchange="checkFree()"></div></div>';
+  h+='</div>';
+  h+='<div class="actions"><button class="primary" id="n_save" onclick="createTermin()">Rezerviši termin</button><span class="hint">Sistem provjeri da se termin ne preklapa.</span></div>';
+  el("modal").innerHTML=h;
+  el("n_dat").value=ymd(0);
+  el("overlay").classList.add("open");
+  setTimeout(()=>{el("n_ime").focus();checkFree();},40);
+}
+function parseOffset(dv){ const d0=new Date();d0.setHours(0,0,0,0); const d1=new Date(dv); return Math.round((d1-d0)/86400000); }
+function checkFree(){
+  const w=el("w_over"), ok=el("w_ok"), save=el("n_save"); if(!w)return;
+  const ri=+el("n_rad").value, dur=USLUGE[+el("n_usl").value].t;
+  const off=parseOffset(el("n_dat").value), sMin=toMin(el("n_vr").value);
+  w.style.display="none"; ok.style.display="none"; save.disabled=false;
+  if(sMin<START || sMin+dur>END){ w.textContent="Termin je van radnog vremena (09:00 do 19:00)."; w.style.display="block"; save.disabled=true; return; }
+  const c=overlap(ri,off,sMin,dur,null);
+  if(c){ w.textContent="Preklapa se sa: "+c.start+" "+uslugaN(c)+" ("+c.musterija+"). Izaberite drugo vrijeme ili radnicu."; w.style.display="block"; save.disabled=true; }
+  else { ok.textContent="Slobodno: "+el("n_vr").value+" do "+fromMin(sMin+dur)+" kod "+RADNICE[ri].n+"."; ok.style.display="block"; }
+}
+function createTermin(){
+  const ime=(el("n_ime").value||"").trim(); if(!ime){el("n_ime").focus();return;}
+  const ri=+el("n_rad").value, ui=+el("n_usl").value, dur=USLUGE[ui].t;
+  const off=parseOffset(el("n_dat").value), sMin=toMin(el("n_vr").value);
+  if(sMin<START||sMin+dur>END){ checkFree(); return; }
+  if(overlap(ri,off,sMin,dur,null)){ checkFree(); return; }
+  const nums=TERM.map(t=>+t.id.split("-")[1]).filter(x=>!isNaN(x));
+  const id="T-"+(Math.max(0,...nums)+1);
+  TERM.push({id,musterija:ime,tel:(el("n_tel").value||"").trim()||"—",kanal:el("n_kanal").value,usluga:ui,radnica:ri,offset:off,start:el("n_vr").value,status:"rezervisano",nap:""});
+  DAN=off; closeModal(); setView("raspored");
+}
+
+setView("raspored");
+</script>
+
+<script>
+/* Signal na ntfy kad se stvarno otvori i zadrzi (owner-detection: Milanove posjete se ne javljaju) */
+(function(){
+  var TOPIC='datamaks-posjete-7g3x', KEY='dm_frizer2584_ntfy', OWNER='dm_owner';
+  try{
+    if(/[?&]owner=1/.test(location.search)) localStorage.setItem(OWNER,'1');
+    if(/[?&]owner=0/.test(location.search)) localStorage.removeItem(OWNER);
+  }catch(e){}
+  try{ if(localStorage.getItem(OWNER)) return; }catch(e){}
+  try{ if(sessionStorage.getItem(KEY)) return; }catch(e){}
+  function send(){
+    try{ if(sessionStorage.getItem(KEY)) return; sessionStorage.setItem(KEY,'1'); }catch(e){}
+    var ref = document.referrer ? (' · izvor: '+document.referrer.replace(/^https?:\/\//,'').split('/')[0]) : '';
+    var utm = /utm_content=frizer/.test(location.search) ? ' (iz maila)' : '';
+    fetch('https://ntfy.sh/'+TOPIC,{method:'POST',
+      body:'Frizerski salon je otvorio prototip i zadrzao se na njemu'+utm+'.'+ref+'\nhttps://demo.datamaks.net/m/2584e92aac/'
+    }).catch(function(){});
+  }
+  var sec=0, iv=setInterval(function(){ if(document.visibilityState==='visible'){ sec++; if(sec>=12){ clearInterval(iv); send(); } } },1000);
+  ['pointerdown','keydown'].forEach(function(ev){ document.addEventListener(ev, function h(){ document.removeEventListener(ev,h); setTimeout(send,3000); }, {once:true}); });
+})();
+</script>
+<script src="/assets/consent.js"></script>
+</body>
+</html>
