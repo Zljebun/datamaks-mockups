@@ -491,7 +491,14 @@ setView("danas");
 <script>
 /* Signal na ntfy kad slastičarna stvarno otvori i zadrži se na prototipu (filtrira botove) */
 (function(){
-  var TOPIC='datamaks-posjete-7g3x', KEY='dm_slasticarna_ntfy';
+  var TOPIC='datamaks-posjete-7g3x', KEY='dm_slasticarna_ntfy', OWNER='dm_owner';
+  // Oznaci vlasnikov (Milanov) uredjaj: otvori jednom sa ?owner=1 (trajno u localStorage). ?owner=0 ponisti.
+  try{
+    if(/[?&]owner=1/.test(location.search)) localStorage.setItem(OWNER,'1');
+    if(/[?&]owner=0/.test(location.search)) localStorage.removeItem(OWNER);
+  }catch(e){}
+  // Vlasnikove posjete NE salju beacon -> svaki primljeni beacon znaci stvarni kupac.
+  try{ if(localStorage.getItem(OWNER)) return; }catch(e){}
   try{ if(sessionStorage.getItem(KEY)) return; }catch(e){}
   function send(){
     try{ if(sessionStorage.getItem(KEY)) return; sessionStorage.setItem(KEY,'1'); }catch(e){}
